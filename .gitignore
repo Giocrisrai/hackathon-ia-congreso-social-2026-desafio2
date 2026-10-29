@@ -1,0 +1,5 @@
+.streamlit/secrets.toml
+registro_ia.jsonl
+__pycache__/
+pruebas/
+desafio2/datos/estudiantes_sinteticos_desafio2.csv
