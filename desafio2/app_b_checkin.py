@@ -145,7 +145,8 @@ with t1:
                     texto, info = ia.llamar([{"role": "system", "content": "Respondes solo JSON válido. " + N.personalizacion(cfg)},
                                              {"role": "user", "content": CLASIFICAR.format(categorias=", ".join(CATEGORIAS), conv=conv_txt(ss.hist))}],
                                             "clasificar", "actual", json_mode=True, temperatura=0)
-                c = N.extraer_json(texto) or clasif_local(solo)
+                c = N.extraer_json(texto)
+                if not isinstance(c, dict): c = clasif_local(solo)
                 c["necesidades"] = [n for n in c.get("necesidades", []) if n in CATEGORIAS] or ["ninguna"]
                 if c.get("servicio_sugerido") not in SERV: c["servicio_sugerido"] = "ninguno"
                 ss.clasif = c; ss.ultimo_info = info; st.rerun()

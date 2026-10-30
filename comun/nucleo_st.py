@@ -24,7 +24,7 @@ URLS = {"openai": "https://api.openai.com/v1/chat/completions",
         "groq": "https://api.groq.com/openai/v1/chat/completions",
         "mistral": "https://api.mistral.ai/v1/chat/completions"}
 MODELOS = {"openai": "gpt-4o-mini", "groq": "openai/gpt-oss-120b", "mistral": "mistral-small-latest"}
-RESPALDO = {"groq": "openai/gpt-oss-20b"}
+RESPALDO = {"groq": "openai/gpt-oss-20b", "mistral": "ministral-8b-latest"}
 _VOSEO = {"elegís": "eliges", "tenés": "tienes", "podés": "puedes", "querés": "quieres", "sabés": "sabes", "sentís": "sientes",
           "contás": "cuentas", "decís": "dices", "necesitás": "necesitas", "preferís": "prefieres", "decidís": "decides", "escribís": "escribes", "pedís": "pides", "estás vos": "estás tú", "vos ": "tú "}
 
@@ -326,10 +326,16 @@ def aviso_si_demo(info: dict):
         st.warning(AVISO_DEMO)
 
 def extraer_json(texto):
-    m = re.search(r"(\{.*\}|\[.*\])", texto or "", re.S)
-    if not m: return None
-    try: return json.loads(m.group(1))
-    except Exception: return None
+    """Primer objeto JSON de la respuesta (los modelos a veces agregan texto o devuelven una lista con el objeto adentro)."""
+    t = (texto or "").strip()
+    for patron in (r"\{.*\}", r"\[.*\]"):
+        m = re.search(patron, t, re.S)
+        if not m: continue
+        try: d = json.loads(m.group(0))
+        except Exception: continue
+        if isinstance(d, list): d = next((x for x in d if isinstance(x, dict)), None)
+        if isinstance(d, dict): return d
+    return None
 
 # ------------------------------------------------------------------ filtros fijos
 _CRISIS = [r"suicid", r"matarme", r"quitarme la vida", r"no quiero (seguir )?vivir", r"hacerme da[ñn]o", r"autolesi", r"cortarme",
