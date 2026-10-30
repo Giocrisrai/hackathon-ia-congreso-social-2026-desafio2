@@ -17,6 +17,7 @@ Plantillas del Desafío 2 (deserción en primer año de educación superior téc
 | Rutas de mejora | [Variante A](desafio2/docs/Rutas_de_mejora_Variante_A.md) · [Variante B](desafio2/docs/Rutas_de_mejora_Variante_B.md) |
 | Línea base y datos | Ficha de línea base [A](desafio2/docs/Ficha_linea_base_Variante_A.md) y [B](desafio2/docs/Ficha_linea_base_Variante_B.md) · [Diccionario de datos](desafio2/docs/Diccionario_datos_Desafio2.md) |
 | Quien quiera su propia versión | [Tutorial: fork, despliegue y cambios por variante](docs/TUTORIAL_FORK.md) |
+| Desafío 3 (mismo sistema) | [Repositorio D3](https://github.com/Giocrisrai/hackathon-ia-congreso-social-2026-desafio3) · apps https://hackaton-d3-pausa.streamlit.app y https://hackaton-d3-ley.streamlit.app |
 
 ## Estructura
 ```
