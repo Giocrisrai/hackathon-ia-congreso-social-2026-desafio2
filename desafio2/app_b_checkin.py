@@ -9,18 +9,15 @@ import nucleo_st as N
 import servicios as S
 
 N.iniciar("D2-B", "Acompaña · Check-in", "💬")
-N.aviso_ia()
 N.acceso()
 cfg, extra = N.configuracion(str(AQUI / "planillas" / "Plantilla_config_D2_Variante_B.xlsx"), "servicios_extra", S.validar_servicio)
 catalogo = S.catalogo(AQUI, extra)
 SERV = dict(zip(catalogo.id_servicio, catalogo.nombre))
+ACCESO = dict(zip(catalogo.id_servicio, catalogo.como_acceder))
 personas = pd.read_csv(AQUI / "datos" / "personas_checkin.csv", dtype=str)
 try: MAX_TURNOS = max(3, min(15, int(cfg.get("max_turnos", "8"))))
 except ValueError: MAX_TURNOS = 8
 CATEGORIAS = sorted(S.CATEGORIAS) + ["ninguna"]
-
-st.title(cfg["titulo_app"])
-st.markdown(cfg["texto_bienvenida"])
 
 # 🔒 Reglas fijas (los equipos solo agregan personalización desde la planilla)
 REGLAS = """Eres "Acompaña", un asistente de check-in para estudiantes de primer año de educación superior en Chile.
@@ -65,6 +62,12 @@ bandeja = N.estado_equipo("bandeja").setdefault("casos", [])
 ss = st.session_state
 ss.setdefault("hist", []); ss.setdefault("turno", 0); ss.setdefault("clasif", None); ss.setdefault("ultimo_info", {})
 conv_txt = lambda h: "\n".join(f"{'Estudiante' if m['role'] == 'user' else 'Asistente'}: {m['content']}" for m in h)
+URG = {"CRISIS": ("🔴 CRISIS", "red"), "alta": ("🟠 Alta", "amber"), "media": ("🟡 Media", "amber"), "baja": ("🟢 Baja", "green")}
+AVATAR = {"assistant": "🤝", "user": "🧑‍🎓"}
+
+def reiniciar():
+    ss.hist, ss.turno, ss.clasif, ss.ultimo_info = [], 0, None, {}
+    ss["_n_checkin"] = ss.get("_n_checkin", 0) + 1
 
 def nuevo_caso(pid, c, origen):
     cid = f"C{len(bandeja) + 1:03d}"
@@ -72,73 +75,121 @@ def nuevo_caso(pid, c, origen):
                     "servicio_sugerido": c.get("servicio_sugerido", "-"), "resumen_ia": c.get("resumen", ""), "conversacion": conv_txt(ss.hist), "decision": "Pendiente"})
     N.registrar({"tipo": "caso_creado", "caso": cid, "origen": origen, "urgencia": c.get("urgencia")}); return cid
 
-t1, t2 = st.tabs(["1 · Check-in (vista estudiante)", "2 · Bandeja del equipo de apoyo (vista humana)"])
+# ------------------------------------------------------------------ pantalla
+N.encabezado(cfg["titulo_app"], cfg["texto_bienvenida"],
+             [f"👥 {st.session_state.get('_equipo')}", f"🎯 Para: {N.corto(cfg.get('usuario'), 70)}", f"💬 Hasta {MAX_TURNOS} mensajes"])
+N.aviso_ia()
+pend = sum(b["decision"] == "Pendiente" for b in bandeja)
+m1, m2, m3, m4 = st.columns(4)
+m1.metric("Casos en la bandeja", len(bandeja))
+m2.metric("Pendientes de revisión", pend)
+m3.metric("Urgentes o crisis", sum(b["urgencia"] in ("CRISIS", "alta") for b in bandeja))
+m4.metric("Consultas a la IA", f"{ia.usadas()} de {ia.limite}")
+
+t1, t2 = st.tabs(["💬 1 · Check-in (vista estudiante)", "📥 2 · Bandeja del equipo de apoyo"])
 with t1:
-    opciones = ["(escribir libremente)"] + [f"{r.id_persona} · {r.nombre_ficticio}, {r.edad} años, {r.carrera} ({r.jornada})" for r in personas.itertuples()]
-    sel = st.selectbox("Simular como (solo para pruebas del equipo)", opciones)
-    pid = sel.split(" · ")[0] if sel.startswith("P") else "libre"
-    if pid != "libre": st.caption("Contexto para actuar (no se envía a la IA): " + personas[personas.id_persona == pid].iloc[0]["contexto_para_simular"])
-    if not ss.hist:
-        ok = st.checkbox(cfg["texto_consentimiento"])
-        if st.button(cfg["texto_boton"], type="primary"):
-            if not ok: st.warning("Para comenzar hay que aceptar el aviso de consentimiento.")
-            else:
-                N.registrar({"tipo": "consentimiento", "persona": pid})
-                ss.hist = [{"role": "assistant", "content": cfg["mensaje_inicial"]}]; st.rerun()
-    for m in ss.hist: st.chat_message(m["role"]).markdown(m["content"])
-    if ss.ultimo_info: N.aviso_si_demo(ss.ultimo_info)
-    if ss.hist and ss.clasif is None:
-        msg = st.chat_input("Escribe aquí…")
-        if msg:
-            ss.hist.append({"role": "user", "content": msg}); ss.turno += 1; ss.ultimo_info = {}
-            if N.crisis(msg):  # 🔒 protocolo de crisis
-                ss.hist.append({"role": "assistant", "content": N.MENSAJE_CRISIS})
-                N.registrar({"tipo": "protocolo_crisis", "entrada": msg, "salida": N.MENSAJE_CRISIS})
-                nuevo_caso(pid, {"urgencia": "CRISIS", "necesidades": ["bienestar"], "resumen": "Señal de crisis detectada automáticamente: contacto humano inmediato."}, "protocolo de crisis")
-            elif ss.turno > MAX_TURNOS:
-                ss.hist.append({"role": "assistant", "content": "Llegamos al final del check-in. Presiona **Terminar check-in**."})
-            else:
-                sistema = REGLAS.format(catalogo=S.texto(catalogo)) + "\n\n" + N.personalizacion(cfg)
-                texto, info = ia.llamar([{"role": "system", "content": sistema}] + ss.hist, "chat", f"{pid}_{ss.turno}", temperatura=0.5, max_tokens=350)
-                if DIAGNOSTICO.search(texto):  # 🔒 validación: la IA no diagnostica
-                    N.registrar({"tipo": "validacion", "tarea": "chat", "salida": texto, "nota": "lenguaje diagnóstico bloqueado"})
-                    texto = "Gracias por contarlo. No puedo darte una opinión de salud, pero sí puedo contarte que existe **Apoyo psicológico y bienestar**. ¿Quieres que te diga cómo acceder?"
-                ss.hist.append({"role": "assistant", "content": texto}); ss.ultimo_info = info
-            st.rerun()
-        if len(ss.hist) > 1 and st.button("Terminar check-in"):
-            solo = " ".join(m["content"] for m in ss.hist if m["role"] == "user")
-            DEMO["clasificar"]["actual"] = json.dumps(clasif_local(solo), ensure_ascii=False)
-            texto, info = ia.llamar([{"role": "system", "content": "Respondes solo JSON válido. " + N.personalizacion(cfg)},
-                                     {"role": "user", "content": CLASIFICAR.format(categorias=", ".join(CATEGORIAS), conv=conv_txt(ss.hist))}],
-                                    "clasificar", "actual", json_mode=True, temperatura=0)
-            c = N.extraer_json(texto) or clasif_local(solo)
-            c["necesidades"] = [n for n in c.get("necesidades", []) if n in CATEGORIAS] or ["ninguna"]
-            if c.get("servicio_sugerido") not in SERV: c["servicio_sugerido"] = "ninguno"
-            ss.clasif = c; ss.ultimo_info = info; st.rerun()
-    if ss.clasif:
-        c = ss.clasif
-        st.markdown("### Resumen del check-in\n" + str(c.get("mensaje_al_estudiante", "")))
-        if c["servicio_sugerido"] in SERV: st.markdown(f"**Apoyo que podría servirte:** {SERV[c['servicio_sugerido']]}")
-        q = st.radio("¿Quieres que **una persona** del equipo de apoyo te contacte? Es voluntario.", ["Sí, quiero que me contacten", "No, gracias"], index=None)
-        util = st.select_slider("¿Te sirvió esta conversación?", ["Nada", "Poco", "Algo", "Mucho"], value="Algo")
-        if st.button("Enviar respuesta") and q:
-            N.registrar({"tipo": "decision_estudiante", "decision": q, "utilidad": util})
-            if q.startswith("Sí"): st.success(f"Listo. Se creó el caso {nuevo_caso(pid, c, 'check-in')}. Una persona lo revisará.")
-            else: st.info("Gracias por responder. Si cambias de opinión, puedes escribir al equipo de apoyo cuando quieras.")
-        if st.button("Nuevo check-in"):
-            ss.hist, ss.turno, ss.clasif, ss.ultimo_info = [], 0, None, {}; st.rerun()
+    chat, lado = st.columns([1.7, 1], gap="large")
+    with lado:
+        with st.container(border=True):
+            st.markdown("**🎭 Simular como** · solo para pruebas del equipo")
+            opciones = ["(escribir libremente)"] + [f"{r.id_persona} · {r.nombre_ficticio}, {r.edad} años, {r.carrera} ({r.jornada})" for r in personas.itertuples()]
+            sel = st.selectbox("Perfil ficticio", opciones, label_visibility="collapsed")
+            pid = sel.split(" · ")[0] if sel.startswith("P") else "libre"
+            if pid != "libre":
+                st.markdown(f'<div class="quote">{N.md(personas[personas.id_persona == pid].iloc[0]["contexto_para_simular"])}</div>', unsafe_allow_html=True)
+                st.caption("Este contexto es para que actúes el papel: no se envía a la IA.")
+        if ss.hist:
+            st.progress(min(ss.turno / MAX_TURNOS, 1.0), text=f"Mensajes del estudiante: {min(ss.turno, MAX_TURNOS)} de {MAX_TURNOS}")
+        N.tarjeta("Qué hace este check-in",
+                  "Conversa unos minutos, orienta hacia un servicio del catálogo y, si la persona quiere, deja el caso en la bandeja. "
+                  "<b>No diagnostica</b> y <b>una persona decide</b> cualquier contacto.", "gray")
+    with chat:
+        if not ss.hist:
+            zona = st.empty()
+            with zona.container(border=True):
+                st.markdown("#### 👋 Antes de empezar")
+                ok = st.checkbox(cfg["texto_consentimiento"], key=f"consent_{ss.get('_n_checkin', 0)}")
+                if st.button(cfg["texto_boton"], type="primary", width="stretch"):
+                    if not ok: st.warning("Para comenzar hay que aceptar el aviso de consentimiento.")
+                    else:
+                        N.registrar({"tipo": "consentimiento", "persona": pid})
+                        ss.hist = [{"role": "assistant", "content": cfg["mensaje_inicial"]}]
+            if ss.hist: zona.empty()
+        for m in ss.hist: st.chat_message(m["role"], avatar=AVATAR[m["role"]]).markdown(m["content"])
+        if ss.ultimo_info: N.aviso_si_demo(ss.ultimo_info)
+        if ss.hist and ss.clasif is None:
+            msg = st.chat_input("Escribe aquí…")
+            if msg:
+                ss.hist.append({"role": "user", "content": msg}); ss.turno += 1; ss.ultimo_info = {}
+                if N.crisis(msg):  # 🔒 protocolo de crisis
+                    ss.hist.append({"role": "assistant", "content": N.MENSAJE_CRISIS})
+                    N.registrar({"tipo": "protocolo_crisis", "entrada": msg, "salida": N.MENSAJE_CRISIS})
+                    nuevo_caso(pid, {"urgencia": "CRISIS", "necesidades": ["bienestar"], "resumen": "Señal de crisis detectada automáticamente: contacto humano inmediato."}, "protocolo de crisis")
+                elif ss.turno > MAX_TURNOS:
+                    ss.hist.append({"role": "assistant", "content": "Llegamos al final del check-in. Presiona **Terminar check-in**."})
+                else:
+                    sistema = REGLAS.format(catalogo=S.texto(catalogo)) + "\n\n" + N.personalizacion(cfg)
+                    with st.spinner("Acompaña está escribiendo…"):
+                        texto, info = ia.llamar([{"role": "system", "content": sistema}] + ss.hist, "chat", f"{pid}_{ss.turno}", temperatura=0.5, max_tokens=350)
+                    if DIAGNOSTICO.search(texto):  # 🔒 validación: la IA no diagnostica
+                        N.registrar({"tipo": "validacion", "tarea": "chat", "salida": texto, "nota": "lenguaje diagnóstico bloqueado"})
+                        texto = "Gracias por contarlo. No puedo darte una opinión de salud, pero sí puedo contarte que existe **Apoyo psicológico y bienestar**. ¿Quieres que te diga cómo acceder?"
+                    ss.hist.append({"role": "assistant", "content": texto}); ss.ultimo_info = info
+                st.rerun()
+            if len(ss.hist) > 1 and st.button("✅ Terminar check-in"):
+                solo = " ".join(m["content"] for m in ss.hist if m["role"] == "user")
+                DEMO["clasificar"]["actual"] = json.dumps(clasif_local(solo), ensure_ascii=False)
+                with st.spinner("Preparando el resumen…"):
+                    texto, info = ia.llamar([{"role": "system", "content": "Respondes solo JSON válido. " + N.personalizacion(cfg)},
+                                             {"role": "user", "content": CLASIFICAR.format(categorias=", ".join(CATEGORIAS), conv=conv_txt(ss.hist))}],
+                                            "clasificar", "actual", json_mode=True, temperatura=0)
+                c = N.extraer_json(texto) or clasif_local(solo)
+                c["necesidades"] = [n for n in c.get("necesidades", []) if n in CATEGORIAS] or ["ninguna"]
+                if c.get("servicio_sugerido") not in SERV: c["servicio_sugerido"] = "ninguno"
+                ss.clasif = c; ss.ultimo_info = info; st.rerun()
+        if ss.clasif:
+            c = ss.clasif
+            N.tarjeta("Resumen del check-in", N.md(c.get("mensaje_al_estudiante", "")), "info")
+            if c["servicio_sugerido"] in SERV:
+                N.tarjeta(f"Apoyo que podría servirte · {SERV[c['servicio_sugerido']]}", "<b>Cómo acceder:</b> " + N.md(ACCESO.get(c["servicio_sugerido"], "")), "ok")
+            with st.container(border=True):
+                q = st.radio("¿Quieres que **una persona** del equipo de apoyo te contacte? Es voluntario.", ["Sí, quiero que me contacten", "No, gracias"], index=None)
+                util = st.select_slider("¿Te sirvió esta conversación?", ["Nada", "Poco", "Algo", "Mucho"], value="Algo")
+                if st.button("Enviar respuesta", type="primary") and q:
+                    N.registrar({"tipo": "decision_estudiante", "decision": q, "utilidad": util})
+                    if q.startswith("Sí"): st.success(f"Listo. Se creó el caso {nuevo_caso(pid, c, 'check-in')}. Una persona lo revisará.")
+                    else: st.info("Gracias por responder. Si cambias de opinión, puedes escribir al equipo de apoyo cuando quieras.")
+            st.button("🔄 Nuevo check-in", on_click=reiniciar)
 with t2:
     st.caption("Aquí llegan los casos. **La IA no contacta a nadie:** una persona revisa y decide. La bandeja la comparten todos los integrantes del equipo.")
-    if not bandeja: st.info("Aún no hay casos.")
+    if not bandeja:
+        N.tarjeta("La bandeja está vacía", "Cuando un estudiante termine un check-in y pida contacto, o se active el protocolo de crisis, el caso aparecerá aquí.", "gray")
     else:
-        st.dataframe(pd.DataFrame(bandeja)[["caso", "persona", "origen", "urgencia", "necesidades", "servicio_sugerido", "decision"]], hide_index=True, width="stretch")
-        cid = st.selectbox("Caso", [b["caso"] for b in bandeja])
+        PRIO = {"CRISIS": 0, "alta": 1, "media": 2, "baja": 3}
+        ordenados = sorted(bandeja, key=lambda x: (x["decision"] != "Pendiente", PRIO.get(x["urgencia"], 4), x["caso"]))
+        df = pd.DataFrame(ordenados)
+        df["Urgencia"] = df.urgencia.map(lambda u: URG.get(u, (u, ""))[0])
+        df["Servicio"] = df.servicio_sugerido.map(lambda s: SERV.get(s, "—"))
+        st.dataframe(df[["caso", "persona", "origen", "Urgencia", "necesidades", "Servicio", "decision"]].rename(columns={
+            "caso": "Caso", "persona": "Persona", "origen": "Origen", "necesidades": "Necesidades", "decision": "Decisión"}), hide_index=True, width="stretch")
+        st.caption("Orden: pendientes primero y, dentro de ellos, los más urgentes.")
+        cid = st.selectbox("Caso a revisar", [b["caso"] for b in ordenados],
+                           format_func=lambda c: next(f"{x['caso']} · {URG.get(x['urgencia'], (x['urgencia'],))[0]}" for x in bandeja if x["caso"] == c))
         b = next(x for x in bandeja if x["caso"] == cid)
-        st.markdown(f"**Urgencia:** {b['urgencia']} · **Servicio sugerido:** {SERV.get(b['servicio_sugerido'], 'ninguno')}  \n**Resumen de la IA (verifícalo):** {b['resumen_ia']}")
+        etiqueta, color = URG.get(b["urgencia"], (b["urgencia"], "gray"))
+        N.tarjeta(f"{cid} · {b['persona']} · {b['origen']}",
+                  N.badge(etiqueta, color) + "".join(N.badge(n.strip(), "teal") for n in b["necesidades"].split(",") if n.strip()) +
+                  f"<br><b>Servicio sugerido:</b> {N.md(SERV.get(b['servicio_sugerido'], 'ninguno'))}<br><b>Resumen de la IA (verifícalo):</b> {N.md(b['resumen_ia'])}",
+                  "bad" if b["urgencia"] == "CRISIS" else "warn" if b["urgencia"] == "alta" else "info")
         with st.expander("Conversación completa"): st.text(b["conversacion"])
-        dec = st.radio("👤 Decisión humana (obligatoria)", ["Contactar hoy", "Agendar esta semana", "Derivar a otro servicio", "Cerrar sin acción"], index=None, key=f"d_{cid}")
-        nota = st.text_input("Nota (opcional)", key=f"n_{cid}")
-        if st.button("Registrar decisión"):
-            if not dec: st.warning("Elige una decisión: la IA no decide por ti.")
-            else: b["decision"] = dec; N.registrar({"tipo": "decision_humana", "caso": cid, "decision": dec, "nota": nota}); st.success(f"{cid}: **{dec}**"); st.rerun()
+        with st.container(border=True):
+            dec = st.radio("👤 Decisión humana (obligatoria)", ["Contactar hoy", "Agendar esta semana", "Derivar a otro servicio", "Cerrar sin acción"],
+                           index=None, key=f"d_{cid}", horizontal=True)
+            nota = st.text_input("Nota (opcional)", key=f"n_{cid}")
+            if st.button("Registrar decisión", type="primary"):
+                if not dec: st.warning("Elige una decisión: la IA no decide por ti.")
+                else:
+                    b["decision"] = dec; N.registrar({"tipo": "decision_humana", "caso": cid, "decision": dec, "nota": nota})
+                    ss["_flash"] = f"{cid}: decisión registrada · **{dec}**"; st.rerun()
+            if ss.get("_flash"): st.success(ss.pop("_flash"))
 N.pie(ia)

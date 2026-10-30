@@ -80,10 +80,60 @@ def registro_equipo() -> pd.DataFrame:
             filas.append(e)
     return pd.DataFrame(filas)
 
+# ------------------------------------------------------------------ apariencia
+_CSS = """<style>
+.block-container{padding-top:1.4rem;padding-bottom:3rem;max-width:1240px}
+.hero{background:linear-gradient(135deg,#0F766E 0%,#155E75 100%);border-radius:18px;padding:22px 28px 16px;margin:0 0 14px 0;box-shadow:0 6px 18px rgba(15,118,110,.18)}
+.hero .h-tit{color:#fff;font-size:1.85rem;font-weight:700;line-height:1.2;margin:0 0 6px 0}
+.hero .h-sub{color:#E6FFFA;font-size:1.02rem;margin:0 0 10px 0;max-width:900px}
+.chip{display:inline-block;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);color:#fff;border-radius:999px;padding:3px 12px;margin:0 6px 6px 0;font-size:.82rem}
+.card{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:14px 18px;margin:0 0 12px 0;box-shadow:0 1px 3px rgba(15,23,42,.05);color:#0F172A}
+.card .c-tit{font-weight:700;font-size:.98rem;margin:0 0 6px 0;color:#0F172A}
+.card .c-txt{font-size:.95rem;line-height:1.5;color:#1E293B}
+.card.ok{border-left:6px solid #16A34A}.card.warn{border-left:6px solid #D97706}.card.bad{border-left:6px solid #DC2626}.card.info{border-left:6px solid #0F766E}.card.gray{border-left:6px solid #94A3B8}
+.badge{display:inline-block;border-radius:999px;padding:2px 10px;font-size:.78rem;font-weight:600;margin:0 6px 5px 0;white-space:nowrap}
+.b-green{background:#DCFCE7;color:#166534}.b-amber{background:#FEF3C7;color:#92400E}.b-red{background:#FEE2E2;color:#991B1B}.b-teal{background:#CCFBF1;color:#115E59}.b-gray{background:#F1F5F9;color:#334155}
+.quote{border-left:4px solid #5EEAD4;padding:8px 12px;color:#334155;font-style:italic;background:#F0FDFA;border-radius:0 10px 10px 0;margin:4px 0 10px 0}
+div[data-testid="stMetric"]{background:#fff;border:1px solid #E2E8F0;border-radius:14px;padding:10px 16px;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+div[data-testid="stMetricLabel"] p{font-size:.85rem;color:#475569}
+.stTabs [data-baseweb="tab-list"]{gap:6px}
+.stTabs [data-baseweb="tab"]{background:#fff;border:1px solid #E2E8F0;border-radius:10px 10px 0 0;padding:6px 14px}
+.stTabs [aria-selected="true"]{background:#F0FDFA;border-color:#99F6E4}
+.pie-nota{color:#64748B;font-size:.8rem;margin-top:24px;text-align:center}
+</style>"""
+
+def estilos():
+    st.markdown(_CSS, unsafe_allow_html=True)
+
+def md(texto) -> str:
+    """Texto de la planilla o de la IA → HTML seguro (escapa todo y solo respeta **negritas** y saltos de línea)."""
+    import html as _h
+    t = _h.escape(str(texto or ""))
+    t = re.sub(r"\*\*(.+?)\*\*", r"<b>\1</b>", t)
+    return t.replace("\n", "<br>")
+
+def badge(texto, color="gray") -> str:
+    return f'<span class="badge b-{color}">{md(texto)}</span>'
+
+def tarjeta(titulo, cuerpo_html, tono="info"):
+    st.markdown(f'<div class="card {tono}"><div class="c-tit">{md(titulo)}</div><div class="c-txt">{cuerpo_html}</div></div>',
+                unsafe_allow_html=True)
+
+def encabezado(titulo, bienvenida, chips=()):
+    ch = "".join(f'<span class="chip">{md(c)}</span>' for c in chips if c)
+    st.markdown(f'<div class="hero"><div class="h-tit">{md(titulo)}</div><div class="h-sub">{md(bienvenida)}</div>{ch}</div>',
+                unsafe_allow_html=True)
+
+def corto(texto, n=60) -> str:
+    t = " ".join(str(texto or "").split())
+    return t if len(t) <= n else t[:n - 1].rstrip() + "…"
+
 # ------------------------------------------------------------------ página y acceso
 def iniciar(app_id: str, titulo: str, icono: str):
     st.set_page_config(page_title=titulo, page_icon=icono, layout="wide")
     st.session_state["_app"] = app_id
+    st.session_state["_titulo_app"] = f"{icono} {titulo}"
+    estilos()
 
 def aviso_ia():
     st.info(AVISO_IA)
@@ -94,20 +144,26 @@ def acceso() -> str:
     if st.session_state.get("_equipo"):
         return st.session_state["_equipo"]
     equipos = {k: dict(v) for k, v in dict(_secret("equipos", {}) or {}).items() if hasattr(v, "keys")}
-    st.subheader("🔐 Ingreso del equipo")
-    c1, c2 = st.columns(2)
-    cod = c1.text_input("Código de equipo").strip().upper()
-    cla = c2.text_input("Clave", type="password").strip()
-    if st.button("Entrar", type="primary"):
-        if cod in equipos and cla == str(equipos[cod].get("clave", "")):
-            st.session_state["_equipo"] = equipos[cod].get("nombre", cod)
-            registrar({"tipo": "ingreso"}); st.rerun()
-        elif not equipos and cod == "DEMO" and cla == "demo":
-            st.session_state["_equipo"] = "demo"; st.rerun()
-        else:
-            st.error("Código o clave incorrectos. Los entrega su mentor.")
-    if not equipos:
-        st.caption("Instalación de prueba: código `demo`, clave `demo`.")
+    _, centro, _ = st.columns([1, 2, 1])
+    with centro:
+        encabezado(st.session_state.get("_titulo_app", "Hackathon IA · Desafío 2"),
+                   "Ninguno se queda atrás · Hackathon IA Aplicada · Congreso Social UC 2026",
+                   ["Desafío 2 · Educación"])
+        aviso_ia()
+        with st.container(border=True):
+            st.markdown("#### 🔐 Ingreso del equipo")
+            c1, c2 = st.columns(2)
+            cod = c1.text_input("Código de equipo", placeholder="Ej: E01").strip().upper()
+            cla = c2.text_input("Clave", type="password").strip()
+            if st.button("Entrar", type="primary", width="stretch"):
+                if cod in equipos and cla == str(equipos[cod].get("clave", "")):
+                    st.session_state["_equipo"] = equipos[cod].get("nombre", cod)
+                    registrar({"tipo": "ingreso"}); st.rerun()
+                elif not equipos and cod == "DEMO" and cla == "demo":
+                    st.session_state["_equipo"] = "demo"; st.rerun()
+                else:
+                    st.error("Código o clave incorrectos. Los entrega su mentor.")
+            st.caption("El código y la clave los entrega su mentor." if equipos else "Instalación de prueba: código `demo`, clave `demo`.")
     st.stop()
 
 # ------------------------------------------------------------------ planilla del equipo
@@ -169,6 +225,13 @@ def configuracion(ruta_plantilla: str, pestana_extra: str, validar_fila) -> tupl
         if ignoradas:
             with st.expander(f"⚠️ {len(ignoradas)} fila(s) ignorada(s) · qué corregir"):
                 for x in ignoradas: st.write("• " + x)
+        cambiados = [c for c in cfg if cfg[c] != cfg_base.get(c)]
+        with st.expander(f"🎛️ Personalización · {len(cambiados)} cambio(s)"):
+            for c, etiqueta in (("usuario", "Usuario"), ("tono", "Tono"), ("largo_respuesta", "Largo"),
+                                ("instrucciones_extra", "Reglas del equipo"), ("ejemplos", "Ejemplos")):
+                marca = " ✏️" if c in cambiados else ""
+                st.markdown(f"**{etiqueta}{marca}:** {corto(cfg.get(c, '') or '(vacío)', 140)}")
+            st.caption("✏️ = cambiado por el equipo respecto de la plantilla base.")
     return cfg, extra_ok
 
 def personalizacion(cfg: dict) -> str:
@@ -273,3 +336,5 @@ def pie(ia: IA):
         if st.button("Salir", width="stretch"):
             for k in ["_equipo", "_sheet_url"]: st.session_state.pop(k, None)
             st.rerun()
+    st.markdown('<div class="pie-nota">Prototipo con datos ficticios · Hackathon IA Aplicada · Congreso Social UC 2026 · '
+                'La decisión final siempre es de una persona.</div>', unsafe_allow_html=True)
