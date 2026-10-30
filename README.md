@@ -50,7 +50,7 @@ Para sumar otra clave no hay que tocar código: se agrega al final de `orden` y 
 
 ## Despliegue (organización)
 1. En https://share.streamlit.io, crear dos apps desde este repositorio, rama `main`, Python 3.12, con *Main file* `desafio2/app_a_panel_tutor.py` y `desafio2/app_b_checkin.py`.
-2. En cada app, **Settings → Secrets**: pegar `.streamlit/secrets.example.toml` con las claves de IA y un bloque `[equipos.EXX]` (nombre y clave) por equipo.
+2. En cada app, **Settings → Secrets**: pegar `.streamlit/secrets.example.toml` con las claves de IA un bloque `[equipos.EXX]` (nombre y clave) por equipo y uno `[equipos.MXX]` por mentor, para que prueben sin gastar la cuota de los equipos.
 3. Subir las planillas base a Google Drive como Hojas de cálculo y compartirlas como Lector.
 4. Abrir las apps antes de cada jornada: se duermen tras 12 horas sin uso. Para guardar el registro de forma permanente, configurar `[registro]` y `[gcp_service_account]`.
 

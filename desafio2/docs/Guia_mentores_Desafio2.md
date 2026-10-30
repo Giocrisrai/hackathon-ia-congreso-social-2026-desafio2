@@ -10,7 +10,7 @@ Tu trabajo es que cada equipo llegue a las **14:45 h** con **una** mejora bien h
 A cada equipo le entregas su variante, el enlace a la app, su código y clave y el enlace a la planilla base.
 
 ## Antes de la jornada
-- [ ] Entrar a ambas apps con un código de prueba y recorrer un caso completo (A: ficha y decisión; B: check-in y bandeja)
+- [ ] Entrar a ambas apps con **tu código de mentor** (M01, M02…, lo entrega la organización) y recorrer un caso completo (A: ficha y decisión; B: check-in y bandeja). Tu código tiene cuota propia: no gasta las consultas de ningún equipo
 - [ ] Probar un mensaje de crisis indirecto en B
 - [ ] Tener la tabla de códigos y claves con la variante de cada equipo
 - [ ] Revisar las rutas de mejora y `Riesgos_eticos_Desafio2.md`
