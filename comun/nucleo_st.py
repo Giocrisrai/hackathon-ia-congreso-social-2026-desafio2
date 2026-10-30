@@ -20,11 +20,19 @@ AVISO_IA = ("⚠️ **Esta herramienta usa inteligencia artificial.** Puede equi
             "para la revisión de la hackathon. Prototipo con datos ficticios.")
 AVISO_DEMO = ("Se muestra una respuesta de demostración: la IA no respondió. Esperen un minuto y prueben de nuevo; "
               "si persiste, avisen a su mentor.")
-URLS = {"openai": "https://api.openai.com/v1/chat/completions",
-        "groq": "https://api.groq.com/openai/v1/chat/completions",
-        "mistral": "https://api.mistral.ai/v1/chat/completions"}
-MODELOS = {"openai": "gpt-4o-mini", "groq": "openai/gpt-oss-120b", "mistral": "mistral-small-latest"}
-RESPALDO = {"groq": "openai/gpt-oss-20b", "mistral": "ministral-8b-latest"}
+# Proveedores compatibles con la API de OpenAI. Para sumar otro (por ejemplo, si la organización consigue una nueva clave)
+# basta con agregarlo en secrets: [ia.<nombre>] api_key, modelos = [...] y, si no está en esta lista, url = ".../chat/completions".
+PROVEEDORES = {
+    "groq":       {"url": "https://api.groq.com/openai/v1/chat/completions", "modelos": ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]},
+    "mistral":    {"url": "https://api.mistral.ai/v1/chat/completions", "modelos": ["mistral-small-latest", "ministral-8b-latest"]},
+    "openai":     {"url": "https://api.openai.com/v1/chat/completions", "modelos": ["gpt-4o-mini"]},
+    "gemini":     {"url": "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions", "modelos": ["gemini-2.5-flash"]},
+    "openrouter": {"url": "https://openrouter.ai/api/v1/chat/completions", "modelos": ["openai/gpt-oss-120b"]},
+    "cerebras":   {"url": "https://api.cerebras.ai/v1/chat/completions", "modelos": ["gpt-oss-120b"]},
+    "together":   {"url": "https://api.together.xyz/v1/chat/completions", "modelos": ["openai/gpt-oss-120b"]},
+    "deepseek":   {"url": "https://api.deepseek.com/chat/completions", "modelos": ["deepseek-chat"]},
+}
+PAUSA_SATURADO, PAUSA_INVALIDO = 45, 600   # segundos que se salta un modelo saturado (429) o con clave/modelo inválido (401/403/404)
 _VOSEO = {"elegís": "eliges", "tenés": "tienes", "podés": "puedes", "querés": "quieres", "sabés": "sabes", "sentís": "sientes",
           "contás": "cuentas", "decís": "dices", "necesitás": "necesitas", "preferís": "prefieres", "decidís": "decides", "escribís": "escribes", "pedís": "pides", "estás vos": "estás tú", "vos ": "tú "}
 
@@ -253,13 +261,22 @@ def personalizacion(cfg: dict) -> str:
 # ------------------------------------------------------------------ IA
 class IA:
     def __init__(self, respuestas_demo: dict | None = None):
-        self.orden = list(_secret("ia.orden", ["openai", "groq", "mistral"]))
-        self.prov = {p: {"clave": _secret(f"ia.{p}.api_key", ""), "modelo": _secret(f"ia.{p}.modelo", MODELOS.get(p, "")),
-                         "respaldo": _secret(f"ia.{p}.modelo_respaldo", RESPALDO.get(p, "")),
-                         "url": _secret(f"ia.{p}.url", URLS.get(p, ""))} for p in self.orden}
+        self.orden = [str(p) for p in _secret("ia.orden", ["groq", "mistral", "openai"])]
+        self.prov = {}
+        for p in self.orden:
+            base = PROVEEDORES.get(p, {"url": "", "modelos": []})
+            modelos = _secret(f"ia.{p}.modelos")
+            if not modelos:  # formato anterior: modelo + modelo_respaldo
+                modelos = [m for m in (_secret(f"ia.{p}.modelo"), _secret(f"ia.{p}.modelo_respaldo")) if m] or base["modelos"]
+            self.prov[p] = {"clave": str(_secret(f"ia.{p}.api_key", "") or ""), "url": _secret(f"ia.{p}.url", base["url"]),
+                            "modelos": [str(m) for m in modelos]}
+        self.cadena = [(p, m) for p in self.orden if self.prov[p]["clave"] and self.prov[p]["url"] for m in self.prov[p]["modelos"]]
         self.limite = int(_secret("ia.limite_consultas_por_equipo", 120))
-        self.sin_claves = not any(v["clave"] for v in self.prov.values())
+        self.sin_claves = not self.cadena
         self.demo = respuestas_demo or {}
+
+    def _pk(self, p, modelo):  # la pausa depende también de la clave: si se corrige la clave en secrets, se vuelve a probar de inmediato
+        return (p, modelo, hashlib.sha1(self.prov[p]["clave"].encode()).hexdigest()[:8])
 
     def _k(self): return f"{st.session_state.get('_app')}|{st.session_state.get('_equipo')}"
     def usadas(self): return _global()["consultas"].get(self._k(), 0)
@@ -269,6 +286,10 @@ class IA:
         if self.usadas() >= self.limite: return f"🟠 Límite de {self.limite} consultas alcanzado: modo demostración"
         return f"🟢 Consultas del equipo: {self.usadas()}/{self.limite}"
 
+    def proveedores(self) -> str:
+        pausas = _global().get("pausas", {})
+        return " → ".join(f"{'⏸️ ' if pausas.get(self._pk(p, m), 0) > time.time() else ''}{p}/{m.split('/')[-1]}" for p, m in self.cadena) or "ninguno"
+
     def llamar(self, mensajes, tarea, clave_demo="", json_mode=False, temperatura=0.3, max_tokens=700):
         info = {"tipo": "llamada_ia", "tarea": tarea, "entrada": mensajes[-1]["content"],
                 "prompt_hash": hashlib.sha1(mensajes[0]["content"].encode()).hexdigest()[:10]}
@@ -277,19 +298,22 @@ class IA:
             if self.usadas() >= self.limite:
                 motivo = "demo (límite de consultas)"
             else:
-                for p in self.orden:
-                    c = self.prov[p]
-                    if not c["clave"]: continue
-                    for modelo in [m for m in (c["modelo"], c["respaldo"]) if m]:  # si el modelo principal se satura, prueba el de respaldo
-                        t0 = time.time()
-                        try:
-                            texto = tutear(self._post({**c, "modelo": modelo}, mensajes, json_mode, temperatura, max_tokens))
-                            g = _global()
-                            with g["lock"]: g["consultas"][self._k()] = g["consultas"].get(self._k(), 0) + 1
-                            info.update(modo="real", proveedor=p, modelo=modelo, latencia_s=round(time.time() - t0, 2), salida=texto)
-                            registrar(info); return texto, info
-                        except Exception as e:
-                            info.setdefault("errores", []).append(f"{p}/{modelo}: {str(e)[:150]}")
+                pausas = _global().setdefault("pausas", {})
+                for p, modelo in self.cadena:  # orden de secrets: proveedor por proveedor y, dentro de cada uno, modelo por modelo
+                    if pausas.get(self._pk(p, modelo), 0) > time.time():
+                        info.setdefault("saltados", []).append(f"{p}/{modelo}"); continue
+                    t0 = time.time()
+                    try:
+                        texto = tutear(self._post({**self.prov[p], "modelo": modelo}, mensajes, json_mode, temperatura, max_tokens))
+                        g = _global()
+                        with g["lock"]: g["consultas"][self._k()] = g["consultas"].get(self._k(), 0) + 1
+                        info.update(modo="real", proveedor=p, modelo=modelo, latencia_s=round(time.time() - t0, 2), salida=texto)
+                        registrar(info); return texto, info
+                    except Exception as e:
+                        cod = getattr(getattr(e, "response", None), "status_code", None)
+                        if cod == 429: pausas[self._pk(p, modelo)] = time.time() + PAUSA_SATURADO
+                        elif cod in (401, 403, 404): pausas[self._pk(p, modelo)] = time.time() + PAUSA_INVALIDO
+                        info.setdefault("errores", []).append(f"{p}/{modelo}: {str(e)[:150]}")
                 motivo = "demo (falla de conexión)"
         b = self.demo.get(tarea, {})
         texto = (b.get(str(clave_demo)) or b.get("_por_defecto") or "[Demostración] Sin respuesta preparada.") if isinstance(b, dict) else str(b)
@@ -303,11 +327,11 @@ class IA:
             cuerpo.update(reasoning_effort="low", max_tokens=max_tokens + 2000)
         if json_mode: cuerpo["response_format"] = {"type": "json_object"}
         for i in range(2):
-            r = requests.post(c["url"], json=cuerpo, timeout=45, headers={"Authorization": f"Bearer {c['clave']}"})
-            if r.status_code == 429 and i == 0:  # límite por minuto: espera lo que indique el proveedor (máximo 8 s) y reintenta
-                try: espera = float(r.headers.get("retry-after", 3))
-                except ValueError: espera = 3
-                time.sleep(min(max(espera, 1), 8)); continue
+            r = requests.post(c["url"], json=cuerpo, timeout=40, headers={"Authorization": f"Bearer {c['clave']}"})
+            if r.status_code == 429 and i == 0:  # saturado: reintenta solo si la espera es corta; si no, pasa al siguiente modelo
+                try: espera = float(r.headers.get("retry-after", 2))
+                except ValueError: espera = 2
+                if espera <= 3: time.sleep(max(espera, 0.5)); continue
             r.raise_for_status()
             texto = (r.json()["choices"][0]["message"].get("content") or "").strip()
             if not texto: raise ValueError("la IA devolvió una respuesta vacía")
@@ -316,7 +340,10 @@ class IA:
 
 def aviso_si_demo(info: dict):
     modo = str(info.get("modo", ""))
-    if modo == "real" or not modo:
+    if modo == "real":
+        st.caption(f"🤖 Respondió {info.get('proveedor')} · {str(info.get('modelo', '')).split('/')[-1]} · {info.get('latencia_s', '?')} s")
+        return
+    if not modo:
         return
     if "límite" in modo:
         st.warning("Se alcanzó el límite de consultas del equipo: se muestra una respuesta de demostración. Avisen a su mentor.")
@@ -351,6 +378,7 @@ def crisis(texto): return any(re.search(p, (texto or "").lower()) for p in _CRIS
 def pie(ia: IA):
     with st.sidebar:
         st.divider(); st.caption(ia.estado())
+        st.caption(f"🤖 IA en orden de uso: {ia.proveedores()}")
         if st.session_state.get("_aviso_reg"): st.warning(st.session_state["_aviso_reg"])
         df = registro_equipo()
         st.download_button("📥 Descargar registro del equipo", df.to_csv(index=False).encode("utf-8"),

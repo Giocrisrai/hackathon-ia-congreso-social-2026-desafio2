@@ -17,6 +17,16 @@ Plantillas del Desafío 2 con **la misma lógica que las del Desafío 3** (G. Pi
 
 Cada planilla base está guardada como una carpeta con un CSV por pestaña. El dataset sintético de 3.000 estudiantes no se versiona: la app lo regenera idéntico la primera vez (`desafio2/datos/generar_estudiantes.py`, semilla fija 2026). Todos los datos son ficticios.
 
+## IA con varios proveedores
+La app prueba los proveedores en el orden de `[ia] orden` y, dentro de cada uno, los modelos de su lista `modelos`. Si un modelo falla o se satura, pasa al siguiente sin que el equipo lo note; los modelos saturados se saltan 45 s y los que tienen clave o nombre inválido, 10 min. Si todos fallan, muestra una respuesta de demostración.
+
+| Orden por defecto | Modelos |
+|---|---|
+| Groq | `openai/gpt-oss-120b` → `openai/gpt-oss-20b` |
+| Mistral | `mistral-small-latest` → `ministral-8b-latest` |
+
+Para sumar otra clave no hay que tocar código: agréguenla al final de `orden` y creen su bloque `[ia.<nombre>]` con `api_key` y `modelos`. Gemini, OpenRouter, Cerebras, Together, DeepSeek y OpenAI ya traen su dirección; cualquier otro proveedor compatible con la API de OpenAI necesita además `url`. La barra lateral muestra la cadena en uso y bajo cada respuesta se indica qué modelo respondió.
+
 ## Despliegue
 1. En share.streamlit.io, crear 2 apps desde este repositorio (rama `main`), una por *Main file*.
 2. En cada app, **Settings → Secrets**: pegar `.streamlit/secrets.example.toml` con la clave de la IA (Groq, modelo `openai/gpt-oss-120b`, con `openai/gpt-oss-20b` de respaldo si el principal se satura) y un bloque `[equipos.EXX]` (nombre y clave) por equipo. Nunca subir `secrets.toml` al repositorio.
