@@ -8,7 +8,7 @@ BASE_IDS = {f"S{i:02d}" for i in range(1, 10)}
 
 def validar_servicio(fila) -> str:
     g = lambda c: str(fila.get(c, "")).strip()
-    if not re.fullmatch(r"[A-Za-z]\w{1,5}", g("id_servicio")): return "id_servicio debe ser corto, por ejemplo X01"
+    if not re.fullmatch(r"[A-Za-z]{1,3}\d{1,3}", g("id_servicio")): return "id_servicio debe ser 1 a 3 letras y 1 a 3 números, por ejemplo X01"
     if g("id_servicio").upper() in BASE_IDS: return "ese id ya existe en el catálogo base (usen X01, X02…)"
     if g("categoria").lower() not in CATEGORIAS: return f"categoria debe ser una de: {', '.join(sorted(CATEGORIAS))}"
     for c in ("nombre", "para_que_sirve", "cuando_sugerirlo", "como_acceder"):

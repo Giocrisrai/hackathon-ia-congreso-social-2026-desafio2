@@ -23,7 +23,16 @@ AVISO_DEMO = ("Se muestra una respuesta de demostración: la IA no respondió. E
 URLS = {"openai": "https://api.openai.com/v1/chat/completions",
         "groq": "https://api.groq.com/openai/v1/chat/completions",
         "mistral": "https://api.mistral.ai/v1/chat/completions"}
-MODELOS = {"openai": "gpt-4o-mini", "groq": "llama-3.3-70b-versatile", "mistral": "mistral-small-latest"}
+MODELOS = {"openai": "gpt-4o-mini", "groq": "openai/gpt-oss-120b", "mistral": "mistral-small-latest"}
+RESPALDO = {"groq": "openai/gpt-oss-20b"}
+_VOSEO = {"elegís": "eliges", "tenés": "tienes", "podés": "puedes", "querés": "quieres", "sabés": "sabes", "sentís": "sientes",
+          "contás": "cuentas", "decís": "dices", "necesitás": "necesitas", "preferís": "prefieres", "decidís": "decides", "escribís": "escribes", "pedís": "pides", "estás vos": "estás tú", "vos ": "tú "}
+
+def tutear(texto: str) -> str:
+    """Corrige el voseo que a veces usan los modelos (elegís → eliges): las apps hablan en español de Chile."""
+    for v, t in _VOSEO.items():
+        texto = re.sub(rf"\b{v}", lambda m, t=t: t.capitalize() if m.group(0)[0].isupper() else t, texto, flags=re.I)
+    return texto
 REGISTRO = Path(os.environ.get("REGISTRO_IA", "registro_ia.jsonl"))
 
 def _secret(ruta, defecto=None):
@@ -246,6 +255,7 @@ class IA:
     def __init__(self, respuestas_demo: dict | None = None):
         self.orden = list(_secret("ia.orden", ["openai", "groq", "mistral"]))
         self.prov = {p: {"clave": _secret(f"ia.{p}.api_key", ""), "modelo": _secret(f"ia.{p}.modelo", MODELOS.get(p, "")),
+                         "respaldo": _secret(f"ia.{p}.modelo_respaldo", RESPALDO.get(p, "")),
                          "url": _secret(f"ia.{p}.url", URLS.get(p, ""))} for p in self.orden}
         self.limite = int(_secret("ia.limite_consultas_por_equipo", 120))
         self.sin_claves = not any(v["clave"] for v in self.prov.values())
@@ -270,15 +280,16 @@ class IA:
                 for p in self.orden:
                     c = self.prov[p]
                     if not c["clave"]: continue
-                    t0 = time.time()
-                    try:
-                        texto = self._post(c, mensajes, json_mode, temperatura, max_tokens)
-                        g = _global()
-                        with g["lock"]: g["consultas"][self._k()] = g["consultas"].get(self._k(), 0) + 1
-                        info.update(modo="real", proveedor=p, modelo=c["modelo"], latencia_s=round(time.time() - t0, 2), salida=texto)
-                        registrar(info); return texto, info
-                    except Exception as e:
-                        info.setdefault("errores", []).append(f"{p}: {str(e)[:150]}")
+                    for modelo in [m for m in (c["modelo"], c["respaldo"]) if m]:  # si el modelo principal se satura, prueba el de respaldo
+                        t0 = time.time()
+                        try:
+                            texto = tutear(self._post({**c, "modelo": modelo}, mensajes, json_mode, temperatura, max_tokens))
+                            g = _global()
+                            with g["lock"]: g["consultas"][self._k()] = g["consultas"].get(self._k(), 0) + 1
+                            info.update(modo="real", proveedor=p, modelo=modelo, latencia_s=round(time.time() - t0, 2), salida=texto)
+                            registrar(info); return texto, info
+                        except Exception as e:
+                            info.setdefault("errores", []).append(f"{p}/{modelo}: {str(e)[:150]}")
                 motivo = "demo (falla de conexión)"
         b = self.demo.get(tarea, {})
         texto = (b.get(str(clave_demo)) or b.get("_por_defecto") or "[Demostración] Sin respuesta preparada.") if isinstance(b, dict) else str(b)
@@ -288,13 +299,19 @@ class IA:
     @staticmethod
     def _post(c, mensajes, json_mode, temperatura, max_tokens):
         cuerpo = {"model": c["modelo"], "messages": mensajes, "temperature": temperatura, "max_tokens": max_tokens}
+        if "gpt-oss" in str(c["modelo"]):  # modelos que razonan antes de responder: razonamiento corto y margen de tokens
+            cuerpo.update(reasoning_effort="low", max_tokens=max_tokens + 2000)
         if json_mode: cuerpo["response_format"] = {"type": "json_object"}
         for i in range(2):
             r = requests.post(c["url"], json=cuerpo, timeout=45, headers={"Authorization": f"Bearer {c['clave']}"})
-            if r.status_code == 429 and i == 0:
-                time.sleep(3); continue
+            if r.status_code == 429 and i == 0:  # límite por minuto: espera lo que indique el proveedor (máximo 8 s) y reintenta
+                try: espera = float(r.headers.get("retry-after", 3))
+                except ValueError: espera = 3
+                time.sleep(min(max(espera, 1), 8)); continue
             r.raise_for_status()
-            return r.json()["choices"][0]["message"]["content"].strip()
+            texto = (r.json()["choices"][0]["message"].get("content") or "").strip()
+            if not texto: raise ValueError("la IA devolvió una respuesta vacía")
+            return texto
         r.raise_for_status()
 
 def aviso_si_demo(info: dict):

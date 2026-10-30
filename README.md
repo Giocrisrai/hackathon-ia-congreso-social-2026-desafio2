@@ -19,7 +19,7 @@ Cada planilla base está guardada como una carpeta con un CSV por pestaña. El d
 
 ## Despliegue
 1. En share.streamlit.io, crear 2 apps desde este repositorio (rama `main`), una por *Main file*.
-2. En cada app, **Settings → Secrets**: pegar `.streamlit/secrets.example.toml` con la clave de la IA y un bloque `[equipos.EXX]` (nombre y clave) por equipo. Nunca subir `secrets.toml` al repositorio.
+2. En cada app, **Settings → Secrets**: pegar `.streamlit/secrets.example.toml` con la clave de la IA (Groq, modelo `openai/gpt-oss-120b`, con `openai/gpt-oss-20b` de respaldo si el principal se satura) y un bloque `[equipos.EXX]` (nombre y clave) por equipo. Nunca subir `secrets.toml` al repositorio.
 3. Abrir las apps antes de cada jornada: se duermen tras 12 horas sin uso.
 
 Guías para mentores y participantes, rutas de mejora y riesgos éticos: se entregan por separado a la organización.

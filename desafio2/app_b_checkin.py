@@ -28,6 +28,8 @@ REGLAS FIJAS:
 3. Solo mencionas servicios del catálogo, por su nombre. No prometes beneficios ni resultados.
 4. No pides datos personales (RUT, dirección, diagnósticos). No haces tareas ni evaluaciones del estudiante.
 5. Si la persona no quiere seguir, lo respetas y te despides. Una persona del equipo de apoyo decide cualquier contacto.
+6. Escribe en español de Chile, tuteando con "tú" (nunca "vos" ni formas como "elegís" o "tenés").
+7. Para explicar cómo acceder a un servicio, usa SOLO lo que dice "Cómo acceder" en el catálogo: no inventes correos, oficinas, plazos ni pasos.
 Catálogo:
 {catalogo}"""
 CLASIFICAR = """Lee la conversación de check-in y responde SOLO con un JSON con estas claves:
@@ -35,7 +37,7 @@ CLASIFICAR = """Lee la conversación de check-in y responde SOLO con un JSON con
 "urgencia": "baja", "media" o "alta";
 "resumen": 2 frases neutrales, sin juicios ni diagnósticos;
 "servicio_sugerido": código del catálogo (ej. "S04") o "ninguno";
-"mensaje_al_estudiante": 2 frases cálidas según el tono indicado.
+"mensaje_al_estudiante": 2 frases cálidas de cierre según el tono indicado, sin preguntas y tuteando con "tú".
 Conversación:
 {conv}"""
 DIAGNOSTICO = re.compile(r"\b(tienes|sufres|padeces|parece que tienes)\s+(depresi[oó]n|ansiedad|un trastorno|tdah|estr[eé]s postraum)|\bdiagn[oó]stic", re.I)

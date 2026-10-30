@@ -91,19 +91,23 @@ REGLAS FIJAS:
 2. Describe lo que muestran los datos sin inventar causas ni datos que no estén.
 3. Sugiere SOLO servicios del catálogo, citando su código entre corchetes, por ejemplo [S04].
 4. El borrador para el estudiante NO menciona puntajes, porcentajes, predicciones, riesgo ni deserción, y deja claro que es voluntario.
+   Escríbelo listo para enviar: sin marcadores entre corchetes como [Nombre] (usa solo "Hola,").
 5. La decisión final es del tutor.
+6. Escribe en español de Chile, tuteando con "tú" (nunca "vos" ni formas como "elegís" o "tenés").
 FORMATO: tres secciones con estos títulos: "1. Lo que muestran los datos", "2. Apoyos posibles", "3. Borrador de mensaje"."""
 PETICION = """Datos del estudiante (ficticio):
 {datos}
 Señales que más pesaron en la priorización: {factores}
 Check-in de la semana 4 (escrito por el estudiante): "{checkin}"
 Catálogo de servicios:
-{catalogo}"""
+{catalogo}
+
+Recuerda: tutea con "tú" (eliges, puedes, quieres), nunca voseo; para cada apoyo usa solo lo que dice el catálogo."""
 
 PROHIBIDAS_BORRADOR = re.compile(r"riesgo|deser|probabilid|predic|puntaje|\d+ ?%|algoritmo", re.I)
 def validar(texto):
     problemas = []
-    codigos = set(re.findall(r"\[([A-Z]\w{1,5})\]", texto))
+    codigos = set(re.findall(r"\[([A-Z]{1,3}\d{1,3})\]", texto))
     malos = sorted(c for c in codigos if c not in set(catalogo.id_servicio))
     if malos: problemas.append(f"cita servicios que no existen en el catálogo: {', '.join(malos)}")
     if not codigos: problemas.append("no cita ningún servicio del catálogo con su código")
@@ -161,8 +165,9 @@ with t1:
     st.caption(f"Mostrando {len(vista)} de {len(cola)}. Para preparar la conversación, ve a la pestaña **2 · Ficha y decisión**.")
 
 with t2:
-    sel = st.selectbox("Estudiante", cola.id_estudiante,
-                       format_func=lambda i: f"N° {int(cola.loc[cola.id_estudiante == i, 'n'].iloc[0])} · {i}")
+    NUM = dict(zip(cola.id_estudiante, cola.n))
+    sel = st.selectbox("Estudiante", list(cola.id_estudiante), key="est_sel",
+                       format_func=lambda i: f"N° {NUM.get(i, '?')} · {i}")
     f = cola[cola.id_estudiante == sel].iloc[0]
     izq, der = st.columns([1, 1.35], gap="large")
     with izq:
@@ -204,7 +209,7 @@ with t2:
                 st.markdown(N.badge("✓ Validación superada: cita servicios del catálogo y el borrador no etiqueta", "green"), unsafe_allow_html=True)
             sec = secciones(texto)
             if sec:
-                cods = [c for c in dict.fromkeys(re.findall(r"\[([A-Z]\w{1,5})\]", sec[1])) if c in set(catalogo.id_servicio)]
+                cods = [c for c in dict.fromkeys(re.findall(r"\[([A-Z]{1,3}\d{1,3})\]", sec[1])) if c in set(catalogo.id_servicio)]
                 acceso = "".join(f"<br>{N.badge(c, 'teal')} {N.md(r.como_acceder)}" for c in cods for r in catalogo[catalogo.id_servicio == c].itertuples())
                 N.tarjeta("1 · Lo que muestran los datos", N.md(sec[0]), "info")
                 N.tarjeta("2 · Apoyos posibles", N.md(sec[1]) + (f"<br><br><b>Cómo se accede:</b>{acceso}" if acceso else ""), "ok")
