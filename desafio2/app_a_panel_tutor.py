@@ -189,7 +189,8 @@ with t2:
         with st.expander("Ver todos los datos"): st.text(datos_txt(f))
     with der:
         clave = f"prop_{sel}"
-        if st.button(cfg["texto_boton"], type="primary", width="stretch"):
+        if st.button(cfg["texto_boton"], type="primary", width="stretch") and not (
+                N.repetido(f"ficha|{sel}") and clave in st.session_state):
             sistema = REGLAS + "\n\n" + N.personalizacion(cfg)
             pet = PETICION.format(datos=datos_txt(f), factores=f["por_que"], checkin=checkin(f), catalogo=S.texto(catalogo))
             with st.spinner("La IA está preparando la propuesta…"):

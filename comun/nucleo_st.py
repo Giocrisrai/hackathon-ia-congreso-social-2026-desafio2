@@ -194,6 +194,7 @@ def acceso() -> str:
             if st.button("Entrar", type="primary", width="stretch"):
                 if cod in equipos and cla == str(equipos[cod].get("clave", "")):
                     st.session_state["_equipo"] = equipos[cod].get("nombre", cod)
+                    st.session_state["_codigo"] = cod
                     registrar({"tipo": "ingreso"}); st.rerun()
                 elif not equipos and cod == "DEMO" and cla == "demo":
                     st.session_state["_equipo"] = "demo"; st.rerun()
@@ -305,7 +306,8 @@ class IA:
     def estado(self):
         if self.sin_claves: return "🟡 Modo demostración (sin conexión a la IA)"
         if self.usadas() >= self.limite: return f"🟠 Límite de {self.limite} consultas alcanzado: modo demostración"
-        return f"🟢 Consultas del equipo: {self.usadas()}/{self.limite}"
+        quien = "de tu código de mentor" if str(st.session_state.get("_codigo", "")).startswith("M") else "del equipo"
+        return f"🟢 Consultas {quien}: {self.usadas()}/{self.limite}"
 
     def proveedores(self) -> str:
         pausas = _global().get("pausas", {})
@@ -397,6 +399,14 @@ MENSAJE_CRISIS = (
 def crisis(texto): return any(re.search(p, (texto or "").lower()) for p in _CRISIS)
 
 # ------------------------------------------------------------------ barra lateral común
+def repetido(firma: str, segundos: int = 20) -> bool:
+    """True si es la misma acción que se acaba de pedir (doble clic): no gasta otra consulta."""
+    ultima, ahora = st.session_state.get("_ultima_accion"), time.time()
+    if ultima and ultima[0] == firma and ahora - ultima[1] < segundos:
+        return True
+    st.session_state["_ultima_accion"] = (firma, ahora)
+    return False
+
 def pie(ia: IA):
     with st.sidebar:
         st.divider(); st.caption(ia.estado())
@@ -407,7 +417,7 @@ def pie(ia: IA):
                            file_name=f"registro_{st.session_state.get('_app')}_{st.session_state.get('_equipo')}.csv",
                            mime="text/csv", width="stretch", disabled=df.empty)
         if st.button("Salir", width="stretch"):
-            for k in ["_equipo", "_sheet_url"]: st.session_state.pop(k, None)
+            for k in ["_equipo", "_codigo", "_sheet_url"]: st.session_state.pop(k, None)
             st.rerun()
     st.markdown('<div class="pie-nota">Prototipo con datos ficticios · Hackathon IA Aplicada · Congreso Social UC 2026 · '
                 'La decisión final siempre es de una persona.</div>', unsafe_allow_html=True)
