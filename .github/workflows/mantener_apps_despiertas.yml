@@ -1,0 +1,20 @@
+name: Mantener apps despiertas
+
+# Streamlit Community Cloud duerme las apps sin visitas. Esta tarea visita las 4 apps
+# de la hackathon (D2 y D3) cada 4 horas y las despierta si hace falta.
+on:
+  schedule:
+    - cron: "17 */4 * * *"     # cada 4 horas (UTC)
+  workflow_dispatch:           # también se puede lanzar a mano desde la pestaña Actions
+
+jobs:
+  despertar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install playwright==1.48.0 && python -m playwright install --with-deps chromium
+      - run: python scripts/despertar_apps.py
