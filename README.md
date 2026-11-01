@@ -54,7 +54,7 @@ Para sumar otra clave no hay que tocar código: se agrega al final de `orden` y 
 1. En https://share.streamlit.io, crear dos apps desde este repositorio, rama `main`, Python 3.12, con *Main file* `desafio2/app_a_panel_tutor.py` y `desafio2/app_b_checkin.py`.
 2. En cada app, **Settings → Secrets**: pegar `.streamlit/secrets.example.toml` con las claves de IA, un bloque `[equipos.EXX]` (nombre y clave) por equipo y uno `[equipos.MXX]` por mentor, para que prueben sin gastar la cuota de los equipos.
 3. Subir las planillas base a Google Drive como Hojas de cálculo y compartirlas como Lector.
-4. Abrir las apps antes de cada jornada: se duermen tras 12 horas sin uso. Para guardar el registro de forma permanente, configurar `[registro]` y `[gcp_service_account]`.
+4. Las apps se duermen sin visitas. La tarea [Mantener apps despiertas](https://github.com/Giocrisrai/hackathon-ia-congreso-social-2026-desafio2/actions/workflows/mantener_apps_despiertas.yml) (GitHub Actions, en el repositorio del D2) visita las 4 apps cada 4 horas y las despierta; igual conviene abrirlas antes de cada jornada. No subir cambios a `main` durante la jornada: cada cambio reinicia la app y reinicia los contadores de consultas. Para guardar el registro de forma permanente, configurar `[registro]` y `[gcp_service_account]`.
 
 ## Pruebas realizadas
 - De punta a punta en navegador real (Chromium): ingreso, ficha y decisión, gráfico de equidad, consentimiento, check-in, protocolo de crisis y bandeja.
