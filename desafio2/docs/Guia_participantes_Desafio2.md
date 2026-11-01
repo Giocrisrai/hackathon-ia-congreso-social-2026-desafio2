@@ -67,7 +67,7 @@ Cada variante trae 6 rutas de mejora (`Rutas_de_mejora_Variante_A.md` y `_B.md`)
 | Aviso rojo de validación (A) | Corrijan el texto y revisen `ejemplos` e `instrucciones_extra` |
 
 ## Para el pitch
-A las **14:15 h** congelen la versión y graben un video de respaldo. Antes de las **14:45 h** entreguen el checklist ético y la declaración de transparencia. Pitch entre las **16:15 y las 18:15 h**: preparen una versión de 3 y otra de 5 minutos.
+A las **14:15 h** congelen la versión y graben un video de respaldo. Antes de las **14:45 h** entreguen el checklist ético y la declaración de transparencia. Pitch entre las **16:15 y las 18:15 h**: **5 minutos de pitch con demo y 3 de preguntas del jurado**. Se evalúa la versión congelada al **cierre técnico (14:45 h)**: lo que cambien después no cuenta.
 
 - [ ] Usuario y problema en una frase
 - [ ] La app lee su planilla, sin filas ignoradas

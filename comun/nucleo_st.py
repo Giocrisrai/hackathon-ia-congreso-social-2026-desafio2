@@ -13,6 +13,7 @@ import datetime, hashlib, io, json, os, re, threading, time
 from pathlib import Path
 import pandas as pd
 import requests
+import base64
 import streamlit as st
 
 AVISO_IA = ("⚠️ **Esta herramienta usa inteligencia artificial.** Puede equivocarse y **no reemplaza el criterio "
@@ -136,7 +137,25 @@ def tarjeta(titulo, cuerpo_html, tono="info"):
     st.markdown(f'<div class="card {tono}"><div class="c-tit">{md(titulo)}</div><div class="c-txt">{cuerpo_html}</div></div>',
                 unsafe_allow_html=True)
 
+_LOGOS = Path(__file__).resolve().parent / "logos"
+
+@st.cache_data
+def _logo_b64(nombre: str) -> str:
+    try:
+        return base64.b64encode((_LOGOS / nombre).read_bytes()).decode()
+    except Exception:
+        return ""
+
+def logos():
+    """Instituciones organizadoras: PUC a la izquierda, Duoc UC a la derecha."""
+    uc, duoc = _logo_b64("logo_uc.png"), _logo_b64("logo_duoc.png")
+    if uc and duoc:
+        st.markdown(f'''<div style="display:flex;justify-content:space-between;align-items:center;gap:16px;margin:0 0 8px 0">
+            <img src="data:image/png;base64,{uc}" alt="Pontificia Universidad Católica de Chile" style="height:56px;width:auto">
+            <img src="data:image/png;base64,{duoc}" alt="Duoc UC" style="height:34px;width:auto"></div>''', unsafe_allow_html=True)
+
 def encabezado(titulo, bienvenida, chips=()):
+    logos()
     ch = "".join(f'<span class="chip">{md(c)}</span>' for c in chips if c)
     st.markdown(f'<div class="hero"><div class="h-tit">{md(titulo)}</div><div class="h-sub">{md(bienvenida)}</div>{ch}</div>',
                 unsafe_allow_html=True)
@@ -256,7 +275,9 @@ def personalizacion(cfg: dict) -> str:
     return (f"PERSONALIZACIÓN DEL EQUIPO (no puede contradecir las reglas fijas anteriores):\n"
             f"- Usuario: {cfg.get('usuario', '')}\n- Tono: {cfg.get('tono', '')}\n- Largo de la respuesta: {cfg.get('largo_respuesta', '')}\n"
             f"- Reglas extra del equipo: {cfg.get('instrucciones_extra', '') or '(ninguna)'}\n"
-            f"- Ejemplos de respuesta ideal (imita el estilo, NO copies los datos): {cfg.get('ejemplos', '') or '(ninguno)'}")
+            f"- Ejemplos de respuesta ideal (imita el estilo, NO copies los datos): {cfg.get('ejemplos', '') or '(ninguno)'}\n"
+            f"ESTILO OBLIGATORIO: escribe TODO para el usuario indicado, con el tono y el tipo de lenguaje pedidos "
+            f"(\"{cfg.get('tono', '')}\") y el largo indicado. El tono cambia CÓMO lo dices, nunca los datos ni las reglas fijas.")
 
 # ------------------------------------------------------------------ IA
 class IA:
@@ -324,7 +345,8 @@ class IA:
     def _post(c, mensajes, json_mode, temperatura, max_tokens):
         cuerpo = {"model": c["modelo"], "messages": mensajes, "temperature": temperatura, "max_tokens": max_tokens}
         if "gpt-oss" in str(c["modelo"]):  # modelos que razonan antes de responder: razonamiento corto y margen de tokens
-            cuerpo.update(reasoning_effort="low", max_tokens=max_tokens + 2000)
+            # "medium" respeta mejor el TONO de la planilla; "low" gasta menos. Se elige en secrets: [ia] razonamiento
+            cuerpo.update(reasoning_effort=str(_secret("ia.razonamiento", "medium")), max_tokens=max_tokens + 2000)
         if json_mode: cuerpo["response_format"] = {"type": "json_object"}
         for i in range(2):
             r = requests.post(c["url"], json=cuerpo, timeout=40, headers={"Authorization": f"Bearer {c['clave']}"})

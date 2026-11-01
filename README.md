@@ -49,6 +49,8 @@ Para sumar otra clave no hay que tocar código: se agrega al final de `orden` y 
 - A: el orden nunca usa sexo, sede ni tipo de colegio; el borrador al estudiante no menciona riesgo, deserción, porcentajes ni predicciones y solo cita servicios del catálogo.
 - B: consentimiento previo, la IA no diagnostica, protocolo de crisis con \*4141, Salud Responde 600 360 7777 y SAMU 131.
 - Español de Chile con tuteo y sin inventar pasos de acceso a los servicios.
+- El tono, el usuario y el largo de la planilla se repiten al final del prompt como estilo obligatorio, con razonamiento medio, para que la IA los respete.
+- Logos de las instituciones organizadoras (Pontificia Universidad Católica de Chile y Duoc UC) en el encabezado.
 
 ## Despliegue (organización)
 1. En https://share.streamlit.io, crear dos apps desde este repositorio, rama `main`, Python 3.12, con *Main file* `desafio2/app_a_panel_tutor.py` y `desafio2/app_b_checkin.py`.
