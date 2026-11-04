@@ -1,6 +1,6 @@
 # Hackathon IA Aplicada · Congreso Social UC 2026 · Desafío 2 · Ninguno se queda atrás
 
-Plantillas del Desafío 2 (deserción en primer año de educación superior técnico-profesional). Cada equipo recibe una app que **ya funciona** y la adapta a un usuario real desde una planilla de Google, sin programar. Misma lógica que las plantillas del Desafío 3: código y clave por equipo, pestaña `config`, pestaña de extras con fila EJEMPLO, botón "Recargar configuración" y 120 consultas a la IA por equipo.
+Plantillas del Desafío 2 (deserción en primer año de educación superior técnico-profesional). Cada equipo copia este repositorio (fork), publica su propia app y la mejora: ver la [guía para equipos](docs/TUTORIAL_FORK.md). Cada equipo recibe una app que **ya funciona** y la adapta a un usuario real desde una planilla de Google, sin programar. Misma lógica que las plantillas del Desafío 3: código y clave por equipo, pestaña `config`, pestaña de extras con fila EJEMPLO, botón "Recargar configuración" y 120 consultas a la IA por equipo.
 
 **Todos los datos son ficticios.**
 
@@ -17,7 +17,7 @@ Plantillas del Desafío 2 (deserción en primer año de educación superior téc
 | Rutas de mejora | [Variante A](desafio2/docs/Rutas_de_mejora_Variante_A.md) · [Variante B](desafio2/docs/Rutas_de_mejora_Variante_B.md) |
 | Línea base y datos | Ficha de línea base [A](desafio2/docs/Ficha_linea_base_Variante_A.md) y [B](desafio2/docs/Ficha_linea_base_Variante_B.md) · [Diccionario de datos](desafio2/docs/Diccionario_datos_Desafio2.md) |
 | Pruebas de mentores | [Plan de pruebas de las 4 apps (D2 y D3)](docs/Plan_de_pruebas_mentores.xlsx) |
-| Quien quiera su propia versión | [Tutorial: fork, despliegue y cambios por variante](docs/TUTORIAL_FORK.md) |
+| **Equipos: copiar y mejorar el código** | [Guía para equipos: fork, publicar la app, recetas de mejora y app nueva](docs/TUTORIAL_FORK.md) |
 | Desafío 3 (mismo sistema) | [Repositorio D3](https://github.com/Giocrisrai/hackathon-ia-congreso-social-2026-desafio3) · apps https://hackaton-d3-pausa.streamlit.app y https://hackaton-d3-ley.streamlit.app |
 
 ## Estructura
@@ -26,6 +26,7 @@ comun/nucleo_st.py              núcleo común: acceso por equipo, lectura de la
                                 registro, validaciones fijas, protocolo de crisis y diseño
 desafio2/app_a_panel_tutor.py   Variante A · Radar de acompañamiento
 desafio2/app_b_checkin.py       Variante B · Acompaña
+desafio2/app_nueva.py           plantilla para que un equipo construya una app nueva con las mismas protecciones
 desafio2/servicios.py           catálogo de servicios y validación de servicios_extra
 desafio2/datos/                 catálogo, perfiles ficticios y generador del dataset sintético (semilla 2026)
 desafio2/planillas/             planilla base de cada variante, un CSV por pestaña

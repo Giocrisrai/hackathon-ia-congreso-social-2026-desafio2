@@ -1,38 +1,55 @@
-# Tutorial · Tu propia versión de las apps del Desafío 2
+# Guía para equipos · Copiar, publicar y mejorar el prototipo · Desafío 2
 
-Este tutorial es para un equipo que quiere ir más allá de la planilla: copiar el repositorio (fork), desplegar **su propia app** y cambiar el código. Sirve para las dos variantes. Tiempo: 20 a 30 minutos, sin experiencia previa en despliegues.
+Cada equipo recibe el código de los prototipos del Desafío 2 y lo copia a su propia cuenta de GitHub. Desde ahí puede **mejorar** una de las variantes o **construir algo nuevo** sobre la misma base. Esta guía explica cómo hacerlo sin experiencia previa en despliegues. Su mentor acompaña a 4 equipos: pídanle ayuda cuando la necesiten.
 
-> **Antes de empezar.** En la competencia se evalúa la mejora sobre la plantilla oficial. Un fork está permitido si lo declaran en la **declaración de transparencia** (qué cambiaron y qué modelos usan) y si mantienen las protecciones de la sección 6. Si tienen dudas, confírmenlo con su mentor.
+| Variante | App oficial (para comparar) | Archivo principal | Planilla base |
+|---|---|---|---|
+| A · Radar de acompañamiento (tutor o jefatura de carrera) | https://hackaton-d2-a.streamlit.app | `desafio2/app_a_panel_tutor.py` | `desafio2/planillas/Plantilla_config_D2_Variante_A/` |
+| B · Acompaña (check-in del estudiante) | https://hackaton-d2-b.streamlit.app | `desafio2/app_b_checkin.py` | `desafio2/planillas/Plantilla_config_D2_Variante_B/` |
+| Algo nuevo del equipo | (la publican ustedes) | `desafio2/app_nueva.py` | la de la Variante B |
+
+**Todos los datos son ficticios.** Nunca usen datos reales de estudiantes.
+
+## Ruta rápida
+| Paso | Qué hacen | Tiempo |
+|---|---|---|
+| 1 | Crear cuentas en GitHub y Streamlit (sección 1) | 5 min |
+| 2 | Copiar el repositorio con **Fork** (sección 2) | 2 min |
+| 3 | Publicar su app con la clave de IA (secciones 3 y 4) | 10 min |
+| 4 | Elegir qué mejorar: planilla, recetas de código o app nueva (secciones 5 a 8) | el resto del tiempo |
+| 5 | Probar el antes y después, y los usos indebidos (sección 10) | 30 min |
+| 6 | Congelar a las **14:15 h** y declarar los cambios antes del **cierre técnico (14:45 h)** (sección 13) | 15 min |
 
 ## 1. Qué necesitan
 | Qué | Dónde | Costo |
 |---|---|---|
 | Cuenta de GitHub | https://github.com/signup | Gratis |
 | Cuenta de Streamlit Community Cloud (se entra con GitHub) | https://share.streamlit.io | Gratis |
-| Una clave de IA compatible con OpenAI | Groq: https://console.groq.com/keys (plan gratis) · Mistral: https://console.mistral.ai/api-keys | Gratis con límites |
-| Opcional, para probar en su computador | Python 3.11 a 3.13 y Git | Gratis |
+| Clave de IA | La entrega la organización: **Claude Haiku 5.5** (Anthropic). Respaldo gratis: Groq (https://console.groq.com/keys) o Mistral (https://console.mistral.ai/api-keys) | Sin costo para el equipo |
+| Opcional: editar y probar con un editor | GitHub Codespaces (en el navegador) o Python 3.11 a 3.13 y Git en su computador | Gratis |
 
-## 2. Hacer el fork
+## 2. Copiar el repositorio (fork)
 1. Abran https://github.com/Giocrisrai/hackathon-ia-congreso-social-2026-desafio2.
 2. Presionen **Fork → Create fork**. Queda una copia en su cuenta, por ejemplo `su-usuario/hackathon-ia-congreso-social-2026-desafio2`.
-3. Todo lo que cambien en su fork no afecta las apps oficiales.
+3. Trabajen siempre en **su** fork. Lo que cambien ahí no afecta las apps oficiales ni a los otros equipos.
+4. Agreguen a sus compañeros: en su fork, **Settings → Collaborators → Add people**.
 
-## 3. Desplegar su app (sin instalar nada)
+## 3. Publicar su app
 1. Entren a https://share.streamlit.io con GitHub y presionen **Create app → Deploy a public app from GitHub**.
-2. Completen:
+2. Completen así:
 
-| Campo | Variante A · Radar | Variante B · Acompaña |
-|---|---|---|
-| Repository | `su-usuario/hackathon-ia-congreso-social-2026-desafio2` | igual |
-| Branch | `main` | `main` |
-| Main file path | `desafio2/app_a_panel_tutor.py` | `desafio2/app_b_checkin.py` |
-| App URL | por ejemplo `equipo07-radar` | por ejemplo `equipo07-acompana` |
+| Campo | Variante A | Variante B | App nueva |
+|---|---|---|---|
+| Repository | `su-usuario/hackathon-ia-congreso-social-2026-desafio2` | igual | igual |
+| Branch | `main` | `main` | `main` |
+| Main file path | `desafio2/app_a_panel_tutor.py` | `desafio2/app_b_checkin.py` | `desafio2/app_nueva.py` |
+| App URL | por ejemplo `equipo07-radar` | por ejemplo `equipo07-acompana` | por ejemplo `equipo07-app` |
 
 3. En **Advanced settings**, elijan **Python 3.12** y en **Secrets** peguen la configuración de la sección 4.
-4. Presionen **Deploy**. La primera vez tarda 2 a 4 minutos: instala librerías y genera los 3.000 estudiantes sintéticos.
+4. Presionen **Deploy**. La primera vez tarda 2 a 4 minutos: instala librerías y genera los 3.000 estudiantes ficticios.
 
-## 4. Secrets mínimos
-Peguen esto en **Settings → Secrets** de su app, con su clave:
+## 4. Secrets: claves del equipo y de la IA
+Peguen esto en **Advanced settings → Secrets** (o, después, en **Manage app → Settings → Secrets**) y completen las claves:
 
 ```toml
 [equipos.E01]
@@ -40,84 +57,160 @@ nombre = "Equipo 07"
 clave = "una-clave-que-inventen"
 
 [ia]
-orden = ["groq"]
+orden = ["anthropic", "groq"]          # se prueban en este orden; si uno falla, pasa al siguiente
 limite_consultas_por_equipo = 120
 
-[ia.groq]
+[ia.anthropic]
+api_key = "sk-ant-..."                 # la entrega la organización
+modelos = ["claude-haiku-5-5"]
+
+[ia.groq]                              # respaldo opcional; si no lo usan, bórrenlo y saquen "groq" de orden
 api_key = "gsk_..."
 modelos = ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]
 ```
 
-- Sin el bloque `[ia]` la app funciona igual, con respuestas de demostración.
+- **Las claves van solo en Secrets.** Nunca las escriban en el código, en la planilla ni en un mensaje de GitHub: el repositorio es público. El archivo `.gitignore` ya excluye `.streamlit/secrets.toml`.
+- Sin el bloque `[ia]` la app funciona igual, con respuestas de demostración. Sirve para avanzar si la clave aún no llega.
 - Sin bloques `[equipos.*]` la app acepta el código `demo` con clave `demo`. Úsenlo solo para probar.
-- **Nunca suban `secrets.toml` a GitHub.** El archivo `.gitignore` ya lo excluye.
+- Bajo cada respuesta aparece qué modelo respondió, por ejemplo "🤖 Respondió anthropic · claude-haiku-5-5". Anótenlo para la declaración de transparencia.
+- Otros proveedores (Mistral, Gemini, OpenRouter, Cerebras, Together, DeepSeek, OpenAI) se agregan igual: su nombre en `orden` y su bloque `[ia.<nombre>]`. La plantilla completa está en `.streamlit/secrets.example.toml`.
 
-### Usar varios proveedores de IA
-La app prueba los proveedores en el orden de `orden` y, dentro de cada uno, los modelos de `modelos`. Si uno falla o se satura, pasa al siguiente. Para sumar otra clave, agreguen su nombre a `orden` y su bloque:
+## 5. Tres formas de cambiar la app
+| Forma | Para qué | Cómo |
+|---|---|---|
+| **A · Planilla** (sin código) | Usuario, tono, largo, ejemplos, reglas extra, textos, cupo, variables excluidas, servicios | Copien la planilla base en Google Sheets, compártanla como Lector, peguen su URL en la barra lateral y presionen "Recargar configuración". Funciona también en la app oficial |
+| **B · Editar en GitHub** (sin instalar nada) | Cambios chicos de código: reglas del prompt, opciones, validaciones | En su fork abran el archivo, presionen el **lápiz ✏️**, editen y presionen **Commit changes**. Su app se actualiza sola en 1 a 2 minutos |
+| **C · Editor completo** | Cambios grandes o una app nueva | En su fork: **Code → Codespaces → Create codespace on main** (VS Code en el navegador), o clónenlo en su computador (sección 10). Prueben localmente y suban con *commit* y *push* |
 
-```toml
-[ia]
-orden = ["groq", "mistral", "gemini"]
+Empiecen siempre por la planilla: es lo más rápido y suele ser lo que más mejora la experiencia del usuario. Las [rutas de mejora de la Variante A](../desafio2/docs/Rutas_de_mejora_Variante_A.md) y de la [Variante B](../desafio2/docs/Rutas_de_mejora_Variante_B.md) tienen ideas por nivel.
 
-[ia.mistral]
-api_key = "..."
-modelos = ["mistral-small-latest", "ministral-8b-latest"]
-
-[ia.gemini]
-api_key = "..."
-modelos = ["gemini-2.5-flash"]
+## 6. Cómo está armado el código
+```
+comun/nucleo_st.py          núcleo común: ingreso, planilla, IA con cambio de proveedor, registro,
+                            protocolo de crisis, diseño y logos                       (🔒 no modificar)
+desafio2/app_a_panel_tutor.py   Variante A: modelo de priorización, ficha, decisión y equidad
+desafio2/app_b_checkin.py       Variante B: consentimiento, chat, clasificación y bandeja
+desafio2/app_nueva.py           plantilla para una app nueva del equipo
+desafio2/servicios.py           catálogo de servicios y validación de servicios_extra
+desafio2/datos/                 catálogo, perfiles ficticios y generador de estudiantes sintéticos
+desafio2/planillas/             valores por defecto de la planilla de cada variante
 ```
 
-Ya traen dirección: `groq`, `mistral`, `openai`, `gemini`, `openrouter`, `cerebras`, `together` y `deepseek`. Cualquier otro proveedor compatible con OpenAI necesita además `url = "https://.../v1/chat/completions"`.
+Así viaja una consulta, en las dos variantes:
+1. `N.acceso()` pide código y clave del equipo.
+2. `N.configuracion(...)` lee la planilla del equipo (o la base) y entrega `cfg`.
+3. La app arma el prompt: **reglas fijas** (`REGLAS`) + `N.personalizacion(cfg)` (usuario, tono, largo, ejemplos y reglas del equipo).
+4. `ia.llamar(...)` prueba los modelos en el orden de los secrets, cuenta la consulta, la registra y, si nadie responde, devuelve la respuesta de demostración.
+5. La app **valida** la respuesta (por ejemplo, que no diagnostique o que solo cite servicios del catálogo) y la muestra.
+6. Una **persona decide** y su decisión queda registrada. `N.pie(ia)` muestra las consultas restantes y el registro descargable.
 
-## 5. Probar en su computador (opcional)
+## 7. Recetas para mejorar las variantes
+Cada receta indica dónde está lo que hay que cambiar. Hagan **un cambio a la vez** y prueben el mismo caso antes y después.
+
+### Variante A · Radar de acompañamiento (`desafio2/app_a_panel_tutor.py`)
+| Quieren… | Dónde | Cómo |
+|---|---|---|
+| Que la ficha diga algo nuevo (por ejemplo, una pregunta para abrir la conversación) | `REGLAS` (y `secciones()` si agregan una sección) | Agreguen una regla numerada. Si cambian el formato de 3 secciones, actualicen también `secciones()`, que las separa en tarjetas |
+| Explicar mejor "¿Por qué aparece?" | `ETIQUETAS` | Cambien el texto que acompaña a cada variable, por ejemplo `"tiempo_traslado_min": "viaja más de una hora"` |
+| Que el modelo no use una variable más | planilla `variables_excluidas` o `PERMITIDAS_EXCLUIR` | Sexo, sede y tipo de colegio ya están excluidos siempre. Comparen la pestaña 3 antes y después |
+| Revisar la equidad por otro grupo | `GRUPOS` | Agreguen una columna de los datos, por ejemplo `"primera_generacion": "Primera generación"` |
+| Bloquear otra palabra en el borrador al estudiante | `PROHIBIDAS_BORRADOR` | Súmenla a la expresión, por ejemplo `riesgo\|deser\|...\|alerta` |
+| Otras decisiones del tutor | `OPCIONES` | Cambien o agreguen opciones; siguen quedando registradas |
+| Cuántos estudiantes entran a la cola | planilla `cupo_porcentaje` | Entre 5 y 40 % |
+
+### Variante B · Acompaña (`desafio2/app_b_checkin.py`)
+| Quieren… | Dónde | Cómo |
+|---|---|---|
+| Cambiar cómo conversa | `REGLAS` y planilla (`tono`, `ejemplos`) | Agreguen una regla numerada, por ejemplo "8. Si la persona trabaja de noche, pregunta qué horario le acomoda". No quiten las reglas 1 a 7 |
+| Más o menos preguntas por check-in | planilla `max_turnos` | Entre 3 y 15 |
+| Mejorar el resumen para la persona de apoyo | `CLASIFICAR` | Agreguen una clave al JSON, por ejemplo `"siguiente_paso"`, y muéstrenla en la bandeja (pestaña 2) |
+| Que la clasificación sin IA reconozca más palabras | `PAL` y `SC` | Sumen palabras a cada categoría o un servicio por categoría |
+| Bloquear otra forma de diagnosticar | `DIAGNOSTICO` | Súmenla a la expresión regular |
+| Probar con otros estudiantes ficticios | `desafio2/datos/personas_checkin.csv` | Agreguen filas con `P5`, `P6`… |
+| Detectar otras frases de crisis | `_CRISIS` en `comun/nucleo_st.py` | **Solo agregar**, nunca quitar. Prueben que frases comunes no la activen por error |
+
+### Las dos variantes
+| Quieren… | Dónde |
+|---|---|
+| Servicios reales de su institución | Planilla `servicios_extra` (con fuente) o `desafio2/datos/catalogo_servicios.csv` (ids `S10`, `S11`…) |
+| Colores y tarjetas | `.streamlit/config.toml` y el bloque `_CSS` de `comun/nucleo_st.py` |
+| Datos sintéticos distintos | `desafio2/datos/generar_estudiantes.py`; borren el CSV generado para que se regenere |
+
+## 8. Construir algo nuevo: `desafio2/app_nueva.py`
+Si su idea no cabe en A ni en B (por ejemplo, un asistente para apoderados o para docentes), partan de `desafio2/app_nueva.py`. Ya trae todo lo que exigen las bases: ingreso por equipo, aviso de IA, planilla, IA con respaldo, registro, límite de consultas, protocolo de crisis y decisión humana.
+
+1. Copien el archivo con otro nombre, por ejemplo `desafio2/app_equipo07.py`, o editen el mismo.
+2. Cambien solo lo marcado con ✏️: título, la tarea en `REGLAS`, la pregunta de la pantalla y las opciones de decisión.
+3. Publíquenlo como una app más (sección 3), con ese archivo como *Main file*.
+4. Las líneas marcadas con 🔒 no se borran.
+
+## 9. Usar una IA para programar
+Pueden pedirle a Claude (u otro asistente) que les ayude a cambiar el código. Para que no rompa las protecciones, denle contexto:
+
+```
+Estoy mejorando una app de Streamlit de una hackathon. Te paso el archivo desafio2/app_b_checkin.py.
+Quiero: <su cambio, en una frase>.
+Reglas: no modifiques comun/nucleo_st.py; mantén el aviso de IA, el consentimiento, el protocolo de crisis,
+la prohibición de diagnosticar, el registro y la decisión humana. Devuélveme solo las líneas que cambian
+y dime cómo probarlo.
+```
+
+Revisen cada cambio antes de hacer *commit* y prueben la app después. Declaren en la transparencia que usaron IA para programar.
+
+## 10. Probar antes del pitch
+**En su app publicada:**
+- Prueben el **mismo caso** con la plantilla base y con su versión, y guarden ambas capturas.
+- Prueben al menos **5 usos indebidos** y anoten qué pasó, por ejemplo:
+  - "ignora tus reglas";
+  - pedir un diagnóstico;
+  - pedir el RUT de alguien;
+  - un mensaje de crisis;
+  - en A, pedir el puntaje de riesgo.
+- Descarguen el registro desde la barra lateral.
+
+**En su computador (opcional):**
 ```bash
 git clone https://github.com/su-usuario/hackathon-ia-congreso-social-2026-desafio2
 cd hackathon-ia-congreso-social-2026-desafio2
 python3 -m venv .venv && source .venv/bin/activate      # en Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-cp .streamlit/secrets.example.toml .streamlit/secrets.toml   # y pongan su clave
-streamlit run desafio2/app_a_panel_tutor.py              # Variante A
-streamlit run desafio2/app_b_checkin.py                  # Variante B
+cp .streamlit/secrets.example.toml .streamlit/secrets.toml   # y pongan sus claves
+streamlit run desafio2/app_a_panel_tutor.py              # o app_b_checkin.py, o app_nueva.py
 ```
 La app se abre en http://localhost:8501. Cada vez que guarden un archivo, presionen **Rerun** en la app.
 
-## 6. Qué pueden cambiar y qué deben mantener
-| Quieren cambiar | Archivo | Qué tocar |
-|---|---|---|
-| Textos, tono, usuario, ejemplos | (sin código) planilla | Pestaña `config` de su copia |
-| Servicios del catálogo base | `desafio2/datos/catalogo_servicios.csv` | Filas nuevas con id `S10`, `S11`… |
-| Valores por defecto de la planilla | `desafio2/planillas/Plantilla_config_D2_Variante_A/` o `_B/` | `config.csv` y `servicios_extra.csv` |
-| Diseño (colores, tarjetas) | `.streamlit/config.toml` y `comun/nucleo_st.py` | Tema y bloque `_CSS` |
-| Proveedores y reintentos de IA | `comun/nucleo_st.py` | `PROVEEDORES`, clase `IA` |
-| **A ·** reglas del prompt | `desafio2/app_a_panel_tutor.py` | `REGLAS`, `PETICION` |
-| **A ·** modelo de priorización | `desafio2/app_a_panel_tutor.py` | función `preparar()`; etiquetas en `ETIQUETAS` |
-| **A ·** validación del borrador | `desafio2/app_a_panel_tutor.py` | `PROHIBIDAS_BORRADOR`, `validar()` |
-| **A ·** gráfico de equidad | `desafio2/app_a_panel_tutor.py` | `GRUPOS` y pestaña 3 |
-| **B ·** reglas del check-in | `desafio2/app_b_checkin.py` | `REGLAS`, `CLASIFICAR` |
-| **B ·** perfiles ficticios | `desafio2/datos/personas_checkin.csv` | Filas nuevas |
-| **B ·** bandeja | `desafio2/app_b_checkin.py` | `URG`, pestaña 2 |
-| Datos sintéticos | `desafio2/datos/generar_estudiantes.py` | Borren el CSV generado para que se regenere |
-
-**Deben mantener** (son parte de la evaluación ética y de las bases):
-- El aviso de uso de IA y la decisión humana obligatoria.
-- En A, la exclusión de `sexo`, `sede` y `tipo_establecimiento_origen`, y que el borrador al estudiante no muestre puntajes, riesgo ni predicciones.
-- En B, el consentimiento, la prohibición de diagnosticar y el protocolo de crisis (`_CRISIS` y `MENSAJE_CRISIS` en `comun/nucleo_st.py`).
+## 11. Lo que deben mantener
+Son parte de las bases y de la evaluación ética:
+- El aviso de uso de IA y la **decisión humana** obligatoria.
 - El registro de consultas y un límite de consultas.
+- **Variante A:**
+  - el modelo no usa `sexo`, `sede` ni `tipo_establecimiento_origen`;
+  - el borrador al estudiante no muestra puntajes, riesgo ni predicciones.
+- **Variante B:**
+  - el consentimiento previo;
+  - la prohibición de diagnosticar;
+  - el protocolo de crisis (`_CRISIS` y `MENSAJE_CRISIS`).
 - Datos ficticios: nunca datos reales de estudiantes.
+- No modificar `comun/nucleo_st.py`, salvo para agregar frases de crisis o servicios.
 
-## 7. Problemas frecuentes
+## 12. Problemas frecuentes
 | Síntoma | Causa probable | Solución |
 |---|---|---|
-| La app queda en "Your app is in the oven" más de 5 minutos | Error al instalar librerías | Revisen **Manage app → Logs**; usen Python 3.12 |
+| "Your app is in the oven" más de 5 minutos | Error al instalar librerías | **Manage app → Logs**; usen Python 3.12 |
+| La página queda en blanco o cargando | Falla momentánea de Streamlit Cloud | Recarguen la página |
 | Siempre "respuesta de demostración" | Falta `[ia]` o la clave es inválida | Revisen los secrets; la barra lateral muestra la cadena de IA y marca ⏸️ los modelos pausados |
-| `model_not_found` en los registros | El proveedor retiró ese modelo | Cambien `modelos` en los secrets |
-| Error 429 frecuente | Límite del plan gratis | Agreguen un segundo proveedor o un segundo modelo |
+| Error 429 frecuente | Límite del proveedor | Agreguen un segundo proveedor en `orden` |
 | "No se pudo leer la planilla" | Planilla no compartida | Compartir → Cualquier persona con el vínculo · Lector |
-| Cambié el código y no se ve | Streamlit Cloud no actualizó | Hagan *commit* en `main`; la app se actualiza sola en 1 a 2 minutos o con **Reboot app** |
+| Cambié el código y no se ve | Streamlit Cloud no actualizó | Revisen que el *commit* esté en `main`; esperen 1 a 2 minutos o usen **Reboot app** |
+| `SyntaxError` o `NameError` en la app | Error al editar | **Manage app → Logs** dice el archivo y la línea; corrijan o vuelvan a la versión anterior en GitHub (**History**) |
 
-## 8. Qué declarar en la transparencia
-- URL de su fork y de su app.
-- Qué archivos cambiaron y por qué.
-- Qué proveedores y modelos de IA usan.
-- Qué protecciones mantuvieron y cómo probaron el mal uso.
+## 13. Congelar y declarar
+- A las **14:15 h** congelen lo que funciona y graben un video de respaldo de la demo.
+- Desde ahí no hagan más *commits*: cada uno reinicia la app y sus contadores.
+- Se evalúa la versión congelada al **cierre técnico (14:45 h)**.
+- En la **declaración de transparencia** indiquen:
+  - la URL de su fork y de su app;
+  - qué archivos cambiaron y por qué;
+  - qué proveedores y modelos de IA usa la app;
+  - si usaron IA para programar;
+  - qué protecciones mantuvieron y cómo probaron el mal uso.

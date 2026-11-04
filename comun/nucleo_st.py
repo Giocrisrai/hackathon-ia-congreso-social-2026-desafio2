@@ -395,7 +395,7 @@ def extraer_json(texto):
     return None
 
 # ------------------------------------------------------------------ filtros fijos
-_CRISIS = [r"suicid", r"matarme", r"quitarme la vida", r"no quiero (seguir )?vivir", r"hacerme da[ñn]o", r"autolesi", r"cortarme",
+_CRISIS = [r"suicid", r"matarme", r"quitarme la vida", r"no quiero (seguir )?viv(ir|iendo)", r"no (le )?veo sentido a (la vida|vivir|seguir)", r"desaparecer para siempre", r"hacerme da[ñn]o", r"autolesi", r"cortarme",
            r"terminar con todo", r"me quiero morir", r"me pega", r"me golpea", r"abus[oa]", r"violaci"]
 MENSAJE_CRISIS = (
     "Gracias por contarlo. Lo que describes es importante y mereces apoyo de una persona ahora, no de una IA.\n\n"
