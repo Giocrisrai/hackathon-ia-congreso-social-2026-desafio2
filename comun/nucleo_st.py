@@ -24,6 +24,7 @@ AVISO_DEMO = ("Se muestra una respuesta de demostración: la IA no respondió. E
 # Proveedores compatibles con la API de OpenAI. Para sumar otro (por ejemplo, si la organización consigue una nueva clave)
 # basta con agregarlo en secrets: [ia.<nombre>] api_key, modelos = [...] y, si no está en esta lista, url = ".../chat/completions".
 PROVEEDORES = {
+    "anthropic":  {"url": "https://api.anthropic.com/v1/chat/completions", "modelos": ["claude-haiku-5-5"]},
     "groq":       {"url": "https://api.groq.com/openai/v1/chat/completions", "modelos": ["openai/gpt-oss-120b", "openai/gpt-oss-20b"]},
     "mistral":    {"url": "https://api.mistral.ai/v1/chat/completions", "modelos": ["mistral-small-latest", "ministral-8b-latest"]},
     "openai":     {"url": "https://api.openai.com/v1/chat/completions", "modelos": ["gpt-4o-mini"]},
@@ -346,10 +347,15 @@ class IA:
     @staticmethod
     def _post(c, mensajes, json_mode, temperatura, max_tokens):
         cuerpo = {"model": c["modelo"], "messages": mensajes, "temperature": temperatura, "max_tokens": max_tokens}
+        claude = "anthropic.com" in str(c["url"]) or str(c["modelo"]).startswith("claude")
+        if claude:
+            # Claude (API compatible con OpenAI): los modelos nuevos rechazan temperature < 1 y el modo json_object
+            # (error 400). Se omiten: el prompt ya pide JSON y extraer_json lo recupera aunque venga entre ```.
+            cuerpo.pop("temperature")
         if "gpt-oss" in str(c["modelo"]):  # modelos que razonan antes de responder: razonamiento corto y margen de tokens
             # "medium" respeta mejor el TONO de la planilla; "low" gasta menos. Se elige en secrets: [ia] razonamiento
             cuerpo.update(reasoning_effort=str(_secret("ia.razonamiento", "medium")), max_tokens=max_tokens + 2000)
-        if json_mode: cuerpo["response_format"] = {"type": "json_object"}
+        if json_mode and not claude: cuerpo["response_format"] = {"type": "json_object"}
         for i in range(2):
             r = requests.post(c["url"], json=cuerpo, timeout=40, headers={"Authorization": f"Bearer {c['clave']}"})
             if r.status_code == 429 and i == 0:  # saturado: reintenta solo si la espera es corta; si no, pasa al siguiente modelo

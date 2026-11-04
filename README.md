@@ -41,6 +41,8 @@ La app prueba los proveedores en el orden de `[ia] orden` y, dentro de cada uno,
 | Groq | `openai/gpt-oss-120b` → `openai/gpt-oss-20b` |
 | Mistral | `mistral-small-latest` → `ministral-8b-latest` |
 
+**Claude (Anthropic)**, el modelo de la organización para el evento, ya está integrado: se agrega `"anthropic"` a `orden` (por ejemplo `orden = ["anthropic", "groq", "mistral"]`) y el bloque `[ia.anthropic]` con `api_key` y `modelos = ["claude-haiku-5-5"]`. La app le adapta sola la llamada: sin `temperature` y con el esquema JSON que Claude acepta.
+
 Para sumar otra clave no hay que tocar código: se agrega al final de `orden` y se crea su bloque `[ia.<nombre>]` con `api_key` y `modelos`. Gemini, OpenRouter, Cerebras, Together, DeepSeek y OpenAI ya traen su dirección; otro proveedor compatible con OpenAI necesita además `url`. La barra lateral muestra la cadena en uso y bajo cada respuesta se indica qué modelo respondió.
 
 ## Protecciones fijas (no se cambian desde la planilla)
