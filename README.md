@@ -1,6 +1,6 @@
 # Hackathon IA Aplicada · Congreso Social UC 2026 · Desafío 2 · Ninguno se queda atrás
 
-Plantillas del Desafío 2 (deserción en primer año de educación superior técnico-profesional). Cada equipo copia este repositorio (fork), publica su propia app y la mejora: ver la [guía para equipos](docs/TUTORIAL_FORK.md). Cada equipo recibe una app que **ya funciona** y la adapta a un usuario real desde una planilla de Google, sin programar. Misma lógica que las plantillas del Desafío 3: código y clave por equipo, pestaña `config`, pestaña de extras con fila EJEMPLO, botón "Recargar configuración" y 120 consultas a la IA por equipo.
+Prototipos de referencia del Desafío 2 (deserción en primer año de educación superior técnico-profesional), preparados por los mentores. Muestran una forma posible de resolver el desafío con IA y con sus protecciones éticas funcionando. Cada equipo puede mejorarlos, adaptarlos o construir su propia solución, y se usan sobre todo en la Etapa 3 · Diseño ([Etapas de la jornada](desafio2/docs/Etapas_jornada_Desafio2.md)). Para copiar el código y publicar una versión propia está la [guía para equipos](docs/TUTORIAL_FORK.md). Los prototipos se adaptan a un usuario desde una planilla de Google, sin programar, con la misma lógica que los del Desafío 3: código y clave por equipo, pestaña `config`, pestaña de extras con fila EJEMPLO, botón "Recargar configuración" y 120 consultas a la IA por equipo.
 
 **Todos los datos son ficticios.**
 
@@ -43,7 +43,7 @@ La app prueba los proveedores en el orden de `[ia] orden` y, dentro de cada uno,
 | Groq | `openai/gpt-oss-120b` → `openai/gpt-oss-20b` |
 | Mistral | `mistral-small-latest` → `ministral-8b-latest` |
 
-**Claude (Anthropic)**, el modelo de la organización para el evento, ya está integrado: se agrega `"anthropic"` a `orden` (por ejemplo `orden = ["anthropic", "groq", "mistral"]`) y el bloque `[ia.anthropic]` con `api_key` y `modelos = ["claude-haiku-5-5"]`. La app le adapta sola la llamada: sin `temperature` y con el esquema JSON que Claude acepta.
+**Claude (Anthropic)** ya está integrado (la organización entrega la clave durante el evento e indica el modelo): se agrega `"anthropic"` a `orden` (por ejemplo `orden = ["anthropic", "groq", "mistral"]`) y el bloque `[ia.anthropic]` con `api_key` y `modelos = ["claude-haiku-5-5"]`. La app le adapta sola la llamada: sin `temperature` y con el esquema JSON que Claude acepta.
 
 Para sumar otra clave no hay que tocar código: se agrega al final de `orden` y se crea su bloque `[ia.<nombre>]` con `api_key` y `modelos`. Gemini, OpenRouter, Cerebras, Together, DeepSeek y OpenAI ya traen su dirección; otro proveedor compatible con OpenAI necesita además `url`. La barra lateral muestra la cadena en uso y bajo cada respuesta se indica qué modelo respondió.
 

@@ -1,8 +1,8 @@
 # Guía para equipos · Copiar, publicar y mejorar el prototipo · Desafío 2
 
-Cada equipo recibe el código de los prototipos del Desafío 2 y lo copia a su propia cuenta de GitHub. Desde ahí puede **mejorar** una de las variantes o **construir algo nuevo** sobre la misma base. Esta guía explica cómo hacerlo sin experiencia previa en despliegues. Su mentor acompaña a 4 equipos: pídanle ayuda cuando la necesiten.
+Los prototipos del Desafío 2 son **material de referencia**: una forma posible de resolver el desafío. Si su equipo decide partir de uno (Etapa 3 · Diseño), copia el código a su propia cuenta de GitHub y desde ahí puede **mejorarlo**, **adaptarlo** o **construir algo nuevo** sobre la misma base. Esta guía explica cómo hacerlo sin experiencia previa en despliegues. Su mentor acompaña a 4 equipos: pídanle ayuda cuando la necesiten.
 
-| Variante | App oficial (para comparar) | Archivo principal | Planilla base |
+| Prototipo | App de referencia | Archivo principal | Planilla base |
 |---|---|---|---|
 | A · Radar de acompañamiento (tutor o jefatura de carrera) | https://hackaton-d2-a.streamlit.app | `desafio2/app_a_panel_tutor.py` | `desafio2/planillas/Plantilla_config_D2_Variante_A/` |
 | B · Acompaña (check-in del estudiante) | https://hackaton-d2-b.streamlit.app | `desafio2/app_b_checkin.py` | `desafio2/planillas/Plantilla_config_D2_Variante_B/` |
@@ -25,7 +25,7 @@ La guía sigue las 8 etapas oficiales de la jornada ([Etapas de la jornada](../d
 |---|---|---|
 | Cuenta de GitHub | https://github.com/signup | Gratis |
 | Cuenta de Streamlit Community Cloud (se entra con GitHub) | https://share.streamlit.io | Gratis |
-| Clave de IA | La entrega la organización: **Claude Haiku 5.5** (Anthropic). Respaldo gratis: Groq (https://console.groq.com/keys) o Mistral (https://console.mistral.ai/api-keys) | Sin costo para el equipo |
+| Clave de IA | La organización entrega una clave de **Claude** (Anthropic) durante el evento e indica el modelo. Respaldo gratis: Groq (https://console.groq.com/keys) o Mistral (https://console.mistral.ai/api-keys) | Sin costo para el equipo |
 | Opcional: editar y probar con un editor | GitHub Codespaces (en el navegador) o Python 3.11 a 3.13 y Git en su computador | Gratis |
 
 ## 2. Copiar el repositorio (fork)
@@ -62,7 +62,7 @@ limite_consultas_por_equipo = 120
 
 [ia.anthropic]
 api_key = "sk-ant-..."                 # la entrega la organización
-modelos = ["claude-haiku-5-5"]
+modelos = ["claude-haiku-5-5"]         # o el modelo que indique la organización
 
 [ia.groq]                              # respaldo opcional; si no lo usan, bórrenlo y saquen "groq" de orden
 api_key = "gsk_..."

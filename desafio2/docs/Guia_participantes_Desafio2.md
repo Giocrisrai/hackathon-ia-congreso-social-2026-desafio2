@@ -3,23 +3,29 @@
 Hackathon IA Aplicada · Congreso Social UC 2026 · 6 de noviembre de 2026 · Duoc UC San Joaquín
 
 ## El desafío en una frase
-Su equipo recibe una herramienta de IA que **ya funciona** y tiene un día para volverla útil, segura y confiable para una persona concreta que acompaña a estudiantes de primer año, o para esos mismos estudiantes.
+Su equipo tiene un día para crear un prototipo con IA que ayude a que **ningún estudiante de primer año se quede atrás**: útil, seguro y confiable para una persona concreta. Esa persona puede ser quien acompaña a los estudiantes o los propios estudiantes.
+
+**Prototipos de referencia.** Los mentores prepararon dos prototipos que ya funcionan y muestran una forma posible de resolver el desafío:
+- **A · Radar de acompañamiento,** para el tutor;
+- **B · Acompaña,** para el estudiante.
+
+Son material de referencia, no una tarea asignada. Pueden mejorarlos, adaptarlos, combinarlos o construir su propia solución. Se usan sobre todo en la **Etapa 3 · Diseño**. Esta guía explica cómo usarlos.
 
 - **Problema:** muchos estudiantes de primer año de educación técnico-profesional dejan la carrera, y las señales aparecen en las primeras semanas: baja la asistencia, se atrasan entregas, aparecen el trabajo o el cuidado de hijos.
-- **Lo que se evalúa:** que la mejora resuelva algo real para su usuario, que funcione en la demo y que hayan pensado en cómo podría usarse mal.
-- **Lo que no se evalúa:** cuánto código escriben. Pueden mejorarla desde una planilla de Google, sin programar, o copiando el código desde GitHub con la [guía para equipos](../../docs/TUTORIAL_FORK.md).
+- **Lo que se evalúa:** que su solución resuelva algo real para su usuario, que la IA aporte valor, que funcione en la demo y que hayan pensado en cómo podría usarse mal. Si parten de un prototipo de referencia, se evalúa lo que ustedes aportan.
+- **Lo que no se evalúa:** cuánto código escriben. Un prototipo de referencia se puede mejorar desde una planilla de Google, sin programar, o copiando el código desde GitHub con la [guía para equipos](../../docs/TUTORIAL_FORK.md).
 
 Todos los datos son **ficticios**.
 
 ## Cómo es la jornada
 Son 8 etapas. En cada una completan una ficha ([Fichas del equipo](Fichas_equipo_Desafio2.md)), y su mentor los acompaña con los mismos criterios. El detalle está en [Etapas de la jornada](Etapas_jornada_Desafio2.md).
 
-| Etapa | Horario | Qué hacen con la plantilla | Entregable |
+| Etapa | Horario | Qué hacen | Entregable |
 |---|---|---|---|
-| 1 · Inmersión | 10:00–10:45 | Entender el problema y conversar con personas reales; mirar la app sin cambiarla | Ficha de Inmersión |
-| 2 · Definición | 10:45–11:15 | Elegir usuario y caso, objetivo medible y 2 a 4 mejoras | Ficha de Definición |
-| 3 · Diseño | 11:15–11:45 | Diagnóstico de la plantilla, dónde cae cada mejora y dónde decide una persona | Ficha de Diseño |
-| 4 · Desarrollo | 11:45–12:45 | Implementar las mejoras en la planilla o en su fork | Registro de cambios |
+| 1 · Inmersión | 10:00–10:45 | Entender el desafío y conversar con personas reales (todavía sin prototipos) | Ficha de Inmersión |
+| 2 · Definición | 10:45–11:15 | Elegir usuario y caso, objetivo medible y alcance del MVP | Ficha de Definición |
+| 3 · Diseño | 11:15–11:45 | Conocer los prototipos de referencia y decidir: partir de uno, combinar o crear el suyo. Funcionalidades, arquitectura y dónde decide una persona | Ficha de Diseño |
+| 4 · Desarrollo | 11:45–12:45 | Construir los componentes en paralelo (planilla, fork o su propio repositorio) | Registro de cambios |
 | 5 · Integración | 13:30–14:15 | Probar el flujo completo, casos límite y mal uso | Registro de pruebas |
 | 6 · Cierre técnico | 14:15–14:45 | Congelar, grabar el respaldo y entregar checklist ético y transparencia | Versión congelada |
 | 7 · Preparación del pitch | 14:45–16:15 | Relato, diapositivas, guion de demo y ensayo | Presentación y guion |
@@ -28,7 +34,7 @@ Son 8 etapas. En cada una completan una ficha ([Fichas del equipo](Fichas_equipo
 ## Antes de empezar
 | Qué | Para qué |
 |---|---|
-| Variante asignada (A o B) | Define qué herramienta mejoran |
+| Prototipo de referencia (A, B o ninguno) | Lo deciden en la Etapa 3 |
 | Enlace a la app | A: https://hackaton-d2-a.streamlit.app · B: https://hackaton-d2-b.streamlit.app |
 | Código y clave del equipo | Entrar a la app (los entrega el mentor) |
 | Enlace a la planilla base | Hacer la copia que van a editar (la entrega el mentor) |
@@ -53,7 +59,7 @@ Si la app tarda en abrir la primera vez, esperen un minuto: se estaba "despertan
 | A: cupo_porcentaje · variables_excluidas | Tamaño de la cola y variables que el orden no usa |
 | B: mensaje_inicial · texto_consentimiento · max_turnos | Inicio, consentimiento y largo del check-in |
 
-## Las dos variantes
+## Los dos prototipos de referencia
 | | A · Radar de acompañamiento | B · Acompaña |
 |---|---|---|
 | Usuario base | Tutor o jefa de carrera con poco tiempo | Estudiante de primer año |
@@ -61,7 +67,7 @@ Si la app tarda en abrir la primera vez, esperen un minuto: se estaba "despertan
 | Quién decide | El tutor registra la decisión | Una persona del equipo de apoyo revisa la bandeja |
 | Pestaña especial | **¿A quién deja fuera?**: gráfico de equidad por grupo | Bandeja ordenada por urgencia |
 
-Cada variante trae 6 rutas de mejora (`Rutas_de_mejora_Variante_A.md` y `_B.md`). Elijan como máximo dos.
+Cada prototipo trae 6 rutas de mejora ([A](Rutas_de_mejora_Variante_A.md) y [B](Rutas_de_mejora_Variante_B.md)). Si parten de uno, elijan como máximo dos.
 
 ## Lo que no se puede cambiar
 - La decisión final es humana.

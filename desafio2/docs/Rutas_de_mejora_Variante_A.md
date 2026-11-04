@@ -2,7 +2,7 @@
 
 Desafío 2 · Educación · Hackathon IA Congreso Social UC 2026
 
-Estas rutas orientan, no obligan. Sirven en la **Etapa 3 · Diseño** para elegir 2 a 4 mejoras, y en la **Etapa 4 · Desarrollo** para implementarlas ([Etapas de la jornada](Etapas_jornada_Desafio2.md)). Pueden seguir una, combinar varias o proponer una propia. Cada ruta parte de una limitación real de la plantilla, descrita en la ficha de línea base. Recomendación: elijan como máximo dos rutas y háganlas bien.
+Estas rutas orientan, no obligan. Son para los equipos que parten de este prototipo de referencia: sirven en la **Etapa 3 · Diseño** para elegir 2 a 4 mejoras, y en la **Etapa 4 · Desarrollo** para implementarlas ([Etapas de la jornada](Etapas_jornada_Desafio2.md)). Pueden seguir una, combinar varias o proponer una propia. Cada ruta parte de una limitación real de la plantilla, descrita en la ficha de línea base. Recomendación: elijan como máximo dos rutas y háganlas bien.
 
 ## Ruta 1 · Ajustar la herramienta a un usuario real
 
