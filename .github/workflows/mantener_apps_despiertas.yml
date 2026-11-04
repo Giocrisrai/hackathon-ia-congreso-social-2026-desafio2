@@ -10,7 +10,7 @@ on:
 jobs:
   despertar:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -18,3 +18,10 @@ jobs:
           python-version: "3.12"
       - run: pip install playwright==1.48.0 && python -m playwright install --with-deps chromium
       - run: python scripts/despertar_apps.py
+      - name: Capturas de las apps que no cargaron
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: capturas
+          path: capturas/
+          retention-days: 7
