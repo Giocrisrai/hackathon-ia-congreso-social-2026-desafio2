@@ -35,4 +35,4 @@ El aviso de uso de IA, el registro de consultas, el límite de 120 consultas por
 
 ## Qué deben entregar
 
-Además del pitch: la declaración de transparencia (qué modelos usaron y qué cambiaron respecto de esta plantilla) y el checklist ético completo antes de las 14:45. Usen el registro descargable de la barra lateral como evidencia.
+En cada etapa, su ficha ([Fichas del equipo](Fichas_equipo_Desafio2.md)). En la Etapa 6 · Cierre técnico (14:15–14:45): la versión congelada, la declaración de transparencia (qué modelos usaron y qué cambiaron respecto de esta plantilla) y el checklist ético completo. Usen el registro descargable de la barra lateral como evidencia. Detalle de cada etapa en [Etapas de la jornada](Etapas_jornada_Desafio2.md).
