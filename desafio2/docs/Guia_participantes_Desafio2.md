@@ -7,9 +7,23 @@ Su equipo recibe una herramienta de IA que **ya funciona** y tiene un día para 
 
 - **Problema:** muchos estudiantes de primer año de educación técnico-profesional dejan la carrera, y las señales aparecen en las primeras semanas: baja la asistencia, se atrasan entregas, aparecen el trabajo o el cuidado de hijos.
 - **Lo que se evalúa:** que la mejora resuelva algo real para su usuario, que funcione en la demo y que hayan pensado en cómo podría usarse mal.
-- **Lo que no se evalúa:** cuánto código escriben. Todo se cambia desde una planilla de Google.
+- **Lo que no se evalúa:** cuánto código escriben. Pueden mejorarla desde una planilla de Google, sin programar, o copiando el código desde GitHub con la [guía para equipos](../../docs/TUTORIAL_FORK.md).
 
 Todos los datos son **ficticios**.
+
+## Cómo es la jornada
+Son 8 etapas. En cada una completan una ficha ([Fichas del equipo](Fichas_equipo_Desafio2.md)), y su mentor los acompaña con los mismos criterios. El detalle está en [Etapas de la jornada](Etapas_jornada_Desafio2.md).
+
+| Etapa | Horario | Qué hacen con la plantilla | Entregable |
+|---|---|---|---|
+| 1 · Inmersión | 10:00–10:45 | Entender el problema y conversar con personas reales; mirar la app sin cambiarla | Ficha de Inmersión |
+| 2 · Definición | 10:45–11:15 | Elegir usuario y caso, objetivo medible y 2 a 4 mejoras | Ficha de Definición |
+| 3 · Diseño | 11:15–11:45 | Diagnóstico de la plantilla, dónde cae cada mejora y dónde decide una persona | Ficha de Diseño |
+| 4 · Desarrollo | 11:45–12:45 | Implementar las mejoras en la planilla o en su fork | Registro de cambios |
+| 5 · Integración | 13:30–14:15 | Probar el flujo completo, casos límite y mal uso | Registro de pruebas |
+| 6 · Cierre técnico | 14:15–14:45 | Congelar, grabar el respaldo y entregar checklist ético y transparencia | Versión congelada |
+| 7 · Preparación del pitch | 14:45–16:15 | Relato, diapositivas, guion de demo y ensayo | Presentación y guion |
+| 8 · Presentación final | 16:15–18:15 | Pitch con demo y preguntas | Nota de aprendizajes |
 
 ## Antes de empezar
 | Qué | Para qué |
@@ -67,7 +81,7 @@ Cada variante trae 6 rutas de mejora (`Rutas_de_mejora_Variante_A.md` y `_B.md`)
 | Aviso rojo de validación (A) | Corrijan el texto y revisen `ejemplos` e `instrucciones_extra` |
 
 ## Para el pitch
-A las **14:15 h** congelen la versión y graben un video de respaldo. Antes de las **14:45 h** entreguen el checklist ético y la declaración de transparencia. Pitch entre las **16:15 y las 18:15 h**: **5 minutos de pitch con demo y 3 de preguntas del jurado**. Se evalúa la versión congelada al **cierre técnico (14:45 h)**: lo que cambien después no cuenta.
+Desde las **14:15 h** (Etapa 6 · Cierre técnico) no agregan nada nuevo: corrigen lo visible, graban un video de respaldo y congelan la versión. Antes de las **14:45 h** entreguen el checklist ético y la declaración de transparencia. Pitch entre las **16:15 y las 18:15 h**: **5 minutos de pitch con demo y 3 de preguntas del jurado**. Se evalúa la versión congelada al **cierre técnico (14:45 h)**: lo que cambien después no cuenta.
 
 - [ ] Usuario y problema en una frase
 - [ ] La app lee su planilla, sin filas ignoradas

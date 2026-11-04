@@ -12,6 +12,7 @@ Plantillas del Desafío 2 (deserción en primer año de educación superior téc
 ## Documentación
 | Para | Documento |
 |---|---|
+| Jornada (8 etapas oficiales) | [Etapas de la jornada](desafio2/docs/Etapas_jornada_Desafio2.md) · [Fichas del equipo por etapa](desafio2/docs/Fichas_equipo_Desafio2.md) |
 | Participantes | [Guía para participantes](desafio2/docs/Guia_participantes_Desafio2.md) · README de la [Variante A](desafio2/docs/README_Variante_A.md) y la [Variante B](desafio2/docs/README_Variante_B.md) |
 | Mentores | [Guía para mentores](desafio2/docs/Guia_mentores_Desafio2.md) · [Riesgos éticos](desafio2/docs/Riesgos_eticos_Desafio2.md) · [Prueba piloto](desafio2/docs/Prueba_piloto_Desafio2.md) |
 | Rutas de mejora | [Variante A](desafio2/docs/Rutas_de_mejora_Variante_A.md) · [Variante B](desafio2/docs/Rutas_de_mejora_Variante_B.md) |

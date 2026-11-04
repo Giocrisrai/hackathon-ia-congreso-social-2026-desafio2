@@ -11,14 +11,14 @@ Cada equipo recibe el código de los prototipos del Desafío 2 y lo copia a su p
 **Todos los datos son ficticios.** Nunca usen datos reales de estudiantes.
 
 ## Ruta rápida
-| Paso | Qué hacen | Tiempo |
-|---|---|---|
-| 1 | Crear cuentas en GitHub y Streamlit (sección 1) | 5 min |
-| 2 | Copiar el repositorio con **Fork** (sección 2) | 2 min |
-| 3 | Publicar su app con la clave de IA (secciones 3 y 4) | 10 min |
-| 4 | Elegir qué mejorar: planilla, recetas de código o app nueva (secciones 5 a 8) | el resto del tiempo |
-| 5 | Probar el antes y después, y los usos indebidos (sección 10) | 30 min |
-| 6 | Congelar a las **14:15 h** y declarar los cambios antes del **cierre técnico (14:45 h)** (sección 13) | 15 min |
+La guía sigue las 8 etapas oficiales de la jornada ([Etapas de la jornada](../desafio2/docs/Etapas_jornada_Desafio2.md)). Las cuentas y el fork conviene dejarlos listos antes del evento.
+
+| Etapa | Qué hacen con esta guía |
+|---|---|
+| 3 · Diseño (11:15–11:45) | Deciden si cada mejora va en la planilla o en el código (secciones 5 a 8) |
+| 4 · Desarrollo (11:45–12:45) | **Preparación del entorno (10 min):** cuentas, fork, colaboradores, app publicada y claves (secciones 1 a 4). Luego implementan en paralelo y guardan el avance con *commit* |
+| 5 · Integración (13:30–14:15) | Unen las mejoras en su fork y prueban el antes y después y los usos indebidos (sección 10) |
+| 6 · Cierre técnico (14:15–14:45) | Solo correcciones, respaldo de la demo, etiqueta `version-final` y declaración de transparencia (sección 13) |
 
 ## 1. Qué necesitan
 | Qué | Dónde | Costo |
@@ -204,10 +204,12 @@ Son parte de las bases y de la evaluación ética:
 | Cambié el código y no se ve | Streamlit Cloud no actualizó | Revisen que el *commit* esté en `main`; esperen 1 a 2 minutos o usen **Reboot app** |
 | `SyntaxError` o `NameError` en la app | Error al editar | **Manage app → Logs** dice el archivo y la línea; corrijan o vuelvan a la versión anterior en GitHub (**History**) |
 
-## 13. Congelar y declarar
-- A las **14:15 h** congelen lo que funciona y graben un video de respaldo de la demo.
-- Desde ahí no hagan más *commits*: cada uno reinicia la app y sus contadores.
-- Se evalúa la versión congelada al **cierre técnico (14:45 h)**.
+## 13. Congelar y declarar (Etapa 6 · Cierre técnico, 14:15–14:45)
+- **Primeros 10 minutos:** solo correcciones visibles para la demo, sin funcionalidades nuevas.
+- **Siguientes 10 minutos:** prueba final completa, un video corto de respaldo y el registro descargado desde la barra lateral.
+- **Últimos 10 minutos:** congelen la versión con un último *commit* y la etiqueta `version-final`. En su fork: **Releases → Draft a new release → Choose a tag**, escriban `version-final`, **Create new tag** y **Publish release**.
+- Después de congelar no hagan más *commits*: cada uno reinicia la app y sus contadores, y se evalúa la versión congelada a las **14:45 h**.
+- Anoten cómo se ejecuta (URL de la app y código de equipo) y las limitaciones conocidas en la [ficha de cierre](../desafio2/docs/Fichas_equipo_Desafio2.md).
 - En la **declaración de transparencia** indiquen:
   - la URL de su fork y de su app;
   - qué archivos cambiaron y por qué;

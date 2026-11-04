@@ -1,6 +1,6 @@
 # Guía para mentores · Desafío 2 · Ninguno se queda atrás
 
-Tu trabajo es que cada equipo llegue a las **14:45 h** con **una** mejora bien hecha, probada y argumentada. Los equipos no programan: cambian la herramienta desde su copia de la planilla.
+Tu trabajo es que cada equipo llegue a las **14:45 h** con una mejora bien hecha, probada y argumentada. Acompañas a 4 equipos con las **guías oficiales del mentor** (8 etapas). Este documento agrega lo propio del Desafío 2. Los equipos pueden cambiar la herramienta desde su copia de la planilla, sin programar, o copiando el código desde GitHub con la [guía para equipos](../../docs/TUTORIAL_FORK.md).
 
 | Variante | App | Planilla base |
 |---|---|---|
@@ -9,11 +9,26 @@ Tu trabajo es que cada equipo llegue a las **14:45 h** con **una** mejora bien h
 
 A cada equipo le entregas su variante, el enlace a la app, su código y clave y el enlace a la planilla base.
 
+## Tu rol en cada etapa
+Detalle por etapa (actividades, señales de alerta y criterios de observación) en [Etapas de la jornada](Etapas_jornada_Desafio2.md). Los equipos completan las [Fichas del equipo](Fichas_equipo_Desafio2.md).
+
+| Etapa | Tu foco en el Desafío 2 |
+|---|---|
+| 1 · Inmersión | Que entiendan el problema antes de tocar la app y conversen con personas reales |
+| 2 · Definición | Recortar: 2 a 4 mejoras, objetivo medible. **Checkpoint ético 1:** ¿qué daño podría causar su objetivo? |
+| 3 · Diseño | Que el diagrama muestre dónde decide una persona y de dónde vienen los datos |
+| 4 · Desarrollo | Desbloquear sin construir por ellos; que no quiten exclusiones, validaciones ni el protocolo de crisis |
+| 5 · Integración | Probar como usuario. **Checkpoint ético 2:** equidad de la cola (A) y crisis indirecta (B) |
+| 6 · Cierre técnico | Congelar, respaldo de la demo, checklist ético y transparencia antes de las 14:45 h |
+| 7 · Preparación del pitch | Ensayo cronometrado, diapositiva de uso responsable, preguntas de mal uso |
+| 8 · Presentación final | No intervenir; después, 2 fortalezas, 1 mejora y una observación ética |
+
 ## Antes de la jornada
 - [ ] Entrar a ambas apps con **tu código de mentor** (M01, M02…, lo entrega la organización) y recorrer un caso completo (A: ficha y decisión; B: check-in y bandeja). Tu código tiene cuota propia: no gasta las consultas de ningún equipo
 - [ ] Probar un mensaje de crisis indirecto en B
 - [ ] Tener la tabla de códigos y claves con la variante de cada equipo
-- [ ] Revisar las rutas de mejora y `Riesgos_eticos_Desafio2.md`
+- [ ] Revisar las rutas de mejora, `Riesgos_eticos_Desafio2.md` y las [Etapas de la jornada](Etapas_jornada_Desafio2.md)
+- [ ] Llevar las fichas de cada etapa para tus 4 equipos (impresas o compartidas)
 - [ ] El día del evento, abrir ambas apps antes de las 9:00 h: se duermen tras 12 horas sin uso
 
 ## Datos para orientar
@@ -44,7 +59,8 @@ Dataset **sintético** de 3.000 estudiantes; deserta el 29,1%.
 1. **Técnico:** revisar la barra lateral (origen de la configuración, filas ignoradas). Si nada carga, borrar la URL y seguir con la base.
 2. **Sin dirección:** "**[usuario]** necesita **[algo]** cuando **[momento]**".
 3. **Ética trabada:** Ruta 6, "Probar el mal uso antes que el jurado".
-4. **A las 14:15 h sin demo estable:** congelar, grabar un minuto y argumentar.
+4. **Sin flujo funcionando a los 30 minutos de la Etapa 5:** reducir alcance y asegurar un recorrido mínimo.
+5. **Al empezar el cierre técnico (14:15 h) sin demo estable:** dejar de agregar, asegurar lo que funciona, grabar un minuto de respaldo y argumentar.
 
 ## Preguntas del jurado para ensayar
 - "¿Y si la institución usa esta lista para no matricular a alguien o para cobranza?"
